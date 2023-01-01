@@ -3,7 +3,7 @@
   <title>Henry Widd's Blog</title>
   <link href="https://widdindustries.com/blog/atom.xml" rel="self"/>
   <link href="https://widdindustries.com/blog"/>
-  <updated>2023-01-01T16:49:12+00:00</updated>
+  <updated>2023-01-01T16:54:44+00:00</updated>
   <id>https://widdindustries.com/blog</id>
   <author>
     <name>Quick Blogger</name>
@@ -262,7 +262,7 @@ cljs.user=&gt; &#40;t/today&#41;
     <link href="https://widdindustries.com/blog/clojure-north.html"/>
     <title>Cross-Platform Date-Time Awesomeness</title>
     <updated>2019-04-23T23:59:59+00:00</updated>
-    <content type="html"><![CDATA[<p>Watch <a href='https://www.youtube.com/watch?v=UFuL-ZDoB2U'>my talk</a> from the <code>Clojure/North 2019</code> conference, </p><p><a href='/assets/clojure-north-2019_.pdf'>Slides here</a></p>]]></content>
+    <content type="html"><![CDATA[<p>Watch <a href='https://www.youtube.com/watch?v=UFuL-ZDoB2U'>my talk</a> from the <code>Clojure/North 2019</code> conference, </p><p><a href='/blog/assets/clojure-north-2019_.pdf'>Slides here</a></p>]]></content>
   </entry>
   <entry>
     <id>https://widdindustries.com/blog/with-redefs-problems.html</id>
