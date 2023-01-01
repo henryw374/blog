@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>you Promise to be Lazy?</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type="application/atom+xml" rel="alternate" href="atom.xml" title="you Promise to be Lazy?">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/components/prism-clojure.min.js"></script>
+    <script type="text/javascript" src="https://livejs.com/live.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism.min.css">
+
+
+
+    <!-- Social sharing (Facebook, Twitter, LinkedIn, etc.) -->
+    <meta name="title" content="you Promise to be Lazy?">
+    <meta name="twitter:title" content="you Promise to be Lazy?">
+    <meta property="og:title" content="you Promise to be Lazy?">
+    <meta property="og:type" content="website">
+
+
+    <meta name="twitter:url" content="https://blog.widdindustries.com/async-meet-laziness.html">
+    <meta property="og:url" content="https://blog.widdindustries.com/async-meet-laziness.html">
+
+
+    <meta name="twitter:card" content="summary">
+
+
+    <meta name="twitter:creator" content="henryw374">
+
+
+    <meta name="twitter:site" content="henryw374">
+
+  </head>
+  <body>
+
+    <div class="site-header">
+      <div class="wrapper">
+        <div class="site-nav">
+          <a class="page-link" href="archive.html">Archive</a>
+          <a class="page-link" href="tags/index.html">Tags</a>
+          <a class="page-link" href="https://github.com/henryw374/blog/discussions/categories/posts">Discuss</a>
+	  <a class="page-link" href="atom.xml">
+            Feed
+          </a>
+	  
+	  <a class="page-link" href="https://twitter.com/henryw374">
+            Twitter
+          </a>
+	  
+	  
+	  <a class="page-link" href="https://widdindustries.com/about">About</a>
+	  
+        </div>
+        <div>
+          <h1 class="site-title">
+            <a class="page-link" href="index.html">Henry Widd&#39;s Blog</a>
+          </h1>
+	  <p>Miscellania</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrapper">
+
+      <h1>
+  
+  you Promise to be Lazy?
+  
+</h1>
+<p>Combining Java's promises with Clojure's laziness yields some interesting behaviour</p><p>Consider:</p><pre><code class="lang-clojure">
+&#40;doseq &#91;x &#40;range 1000000&#41;&#93;&#41;
+
+</code></pre><p>Since <code>range</code> returns a lazy sequence and <code>doseq</code> does not retain the head of the sequence, there will only be one element of the sequence realized at every step of the <code>doseq</code>.</p><p>Now let's split the creation and consumption of the lazy sequence over chained promises.  I am using <a href='https://github.com/funcool/promesa'>the promesa library</a>, which on the jvm is a thin wrapper over java.util.concurrent#CompletableFuture.</p><pre><code class="lang-clojure">
+&#40;-&gt; &#40;p/resolved &#40;range 1000000&#41;&#41;
+    &#40;p/then &#40;fn &#91;xs&#93;
+              &#40;doseq &#91;x xs&#93;&#41;&#41;&#41;&#41;
+
+</code></pre><p>It looks like it should be just as lazy. Nowhere is the code above retaining a reference to  the head of the sequence - and yet it is! </p><p>The <code>then</code> promise internally has a reference to the preceding promise and that promise has a reference to its result - the head of the sequence. When the first promise returns, the sequence is unrealized, but as the subsequent <code>then</code> promise consumes the sequence it is realized and the head retained  by the preceding promise!</p><p>What happens if there is a longer chain of promises? A promise executing in a chain only has reference to the preceding one. The preceding one has lost its reference to the  next one upstream of itself, so in a chain just the current and immediately preceding one are not  gc-able. </p><p>So? Well imagine you are streaming results out of a db for example - that might be  modelled as a lazy seq, which is consumed through e.g. doseq and written out to a  stream. Sounds like a nice memory-friendly solution, but if the db request results in a  promise it might seem natural to keep chaining that result on. </p><h1>Further thoughts</h1><p>Does this apply to </p><ul><li>js promises? I would imagine so</li><li>core.async channels? I would guess not</li></ul><p>I haven't investigated.</p><p>Related to this topic is <a href='https://stuartsierra.com/2015/08/25/clojure-donts-lazy-effects'>Stuart Sierra's Lazy Effects</a> post, in which he says never mix laziness and side-effects. Good advice I would say.</p>
+<p>Discuss this post <a href="https://github.com/henryw374/blog/discussions/categories/posts">here</a>.</p>
+<p><i>Published: 2022-02-03</i></p>
+
+<p>
+  <i>
+  Tagged:
+  
+  <span class="tag">
+    <a href="tags/clojure.html">clojure</a>
+  </span>
+  
+  </i>
+</p>
+
+
+
+      
+      <div style="margin-bottom: 20px; float: right;">
+        <a class="page-link" href="archive.html">Archive</a>
+      </div>
+      
+    </div>
+  </body>
+</html>

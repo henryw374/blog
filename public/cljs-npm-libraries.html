@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>How to package Clojurescript libraries</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type="application/atom+xml" rel="alternate" href="atom.xml" title="How to package Clojurescript libraries">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/components/prism-clojure.min.js"></script>
+    <script type="text/javascript" src="https://livejs.com/live.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism.min.css">
+
+
+
+    <!-- Social sharing (Facebook, Twitter, LinkedIn, etc.) -->
+    <meta name="title" content="How to package Clojurescript libraries">
+    <meta name="twitter:title" content="How to package Clojurescript libraries">
+    <meta property="og:title" content="How to package Clojurescript libraries">
+    <meta property="og:type" content="website">
+
+
+    <meta name="twitter:url" content="https://blog.widdindustries.com/cljs-npm-libraries.html">
+    <meta property="og:url" content="https://blog.widdindustries.com/cljs-npm-libraries.html">
+
+
+    <meta name="twitter:card" content="summary">
+
+
+    <meta name="twitter:creator" content="henryw374">
+
+
+    <meta name="twitter:site" content="henryw374">
+
+  </head>
+  <body>
+
+    <div class="site-header">
+      <div class="wrapper">
+        <div class="site-nav">
+          <a class="page-link" href="archive.html">Archive</a>
+          <a class="page-link" href="tags/index.html">Tags</a>
+          <a class="page-link" href="https://github.com/henryw374/blog/discussions/categories/posts">Discuss</a>
+	  <a class="page-link" href="atom.xml">
+            Feed
+          </a>
+	  
+	  <a class="page-link" href="https://twitter.com/henryw374">
+            Twitter
+          </a>
+	  
+	  
+	  <a class="page-link" href="https://widdindustries.com/about">About</a>
+	  
+        </div>
+        <div>
+          <h1 class="site-title">
+            <a class="page-link" href="index.html">Henry Widd&#39;s Blog</a>
+          </h1>
+	  <p>Miscellania</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrapper">
+
+      <h1>
+  
+  How to package Clojurescript libraries
+  
+</h1>
+<h1>Update (2021-07-18)</h1><p>The Reagent project, one of the better known cljs projects that depends on a javascript lib, has abandoned Clojurescript's dependency mechanisms (foreign-libs or deps.cljs) entirely, making users bring their own React, see <a href='https://github.com/reagent-project/reagent/issues/537'>this issue</a> for details.</p><p>Original content from here on :</p><p>If you are authoring a Clojurescript library that doesn't depend on any regular Javascript (JS) code, transitively or otherwise then things are pretty straightforward: maven-package your library and put it in Clojars - job done!</p><p>Still reading? OK, well things are not as straightforward when libs do depend on JS code. As of this writing there is no guide I know of that explains everything you'd need to know, so think of this as a first draft of such a guide. Ideally the content here could go on to be included in the <a href='https://clojurescript.org/'>Clojurescript Site</a>, as a solution for open tickets such as <a href='https://github.com/clojure/clojurescript-site/issues/224'>this</a>. Also note that what I describe here all works since the <a href='https://clojurescript.org/news/2020-04-24-release'>April 2020 release of Clojurescript</a> - There were some changes in that release that significantly improve the situation regarding libraries.</p><p>The main consideration is how to package a library so that Clojurescript users can consume it, whatever their build setup. To that end, I have created <a href='https://github.com/henryw374/clojurescript-library-consumers-test'>this companion repo</a> to demonstrate different Cljs build setups (Shadow, target-bundle, cljsjs, npm-deps) all consuming the same (npm-depending) library and all targeting the same thing: a browser build with advanced optimizations. The library used as an example is one of mine, called <a href='https://github.com/henryw374/cljs.java-time'>cljs.java-time</a>. This uses code from a single, standalone npm library 'js-joda' - so about as straightforward an example as you can get.</p><h1>Brief Background</h1><p>In Clojure (JVM) land, consuming maven-packaged Java libraries is seamless and ubiquitous. If you find a Clojure library that looks useful and that library ultimately depends on one or more Java libraries, then installation will not an issue. The Java libraries will get pulled down along with all the Clojure libraries and the overall artifact size won't likely be a major concern, within reason.</p><p>With Clojurescript, it's a bit different. Having a low overall artifact sizes may be crucial to your users for one thing. For another, regular JS libs are stored in NPM, which Clojure dependency tools like tools.deps do not currently work with. </p><p>Clearly having Clojurescript libraries depending on plain JS is possible, and has been since the early days of Clojurescript via <code>:foreign-libs</code>, but for good reasons the story doesn't end there. JS-using libraries (like <a href='https://github.com/reagent-project/reagent'>Reagent</a> for example) usually have something in the README to explain how to consume them - because it's not as straightforward as on the JVM.</p><h2>Why would Clojurescript libraries depend on NPM libraries?</h2><p>A maven-packaged ecosystem exists that shadows a lot of stuff from npm, called <a href='https://github.com/cljsjs/packages'>Cljsjs</a>, so why would anyone bother complicating their build with a second dependency/build tool?</p><ul><li>End users might have a set up where they want code from npm libraries A and B, which both depend on npm library C, but possibly different versions of C. People don't want to be in the business of sorting out these kinds of situations by hand. Thomas Heller goes into <a href='https://code.thheller.com/blog/shadow-cljs/2017/09/15/js-dependencies-the-problem.html'>more detail about why Cljsjs doesn't scale</a>.</li><li>Users are already happily using npm and don't want to have to package up foreign-libs for everything.</li></ul><p>IOW - if people are using more than one or two JS libraries in their Clojurescript build, then using npm will likely be their preferred solution. Shadow-Cljs is one popular way to set that up and the newly released <code>:bundle</code> target in Clojurescript is an alternative. </p><h2>Should your Library depend on Cljsjs?</h2><p>We can't say what proportion of Cljs users are using npm in their build, but we can try to use some proxies to guess. The <a href='https://clojure.org/news/2020/02/20/state-of-clojure-2020'>Clojure survey</a> doesn't ask this specifically unfortunately, but what we can see is that there is still plenty of <a href='https://github.com/cljsjs/packages/graphs/commit-activity'>activity in the Cljsjs repo</a>. It be good to see the graph over time of Clojars downloads of Cljsjs packages too... tbd. I would expect to see use of Cljsjs diminish over time, but my feeling is that it's not going to be abandoned any time soon. </p><p>It is an option to have your library <em>not</em> depend on any Cljsjs libraries and have instructions in your readme for non-npm users that they'll need to add the Cljsjs dependencies themselves. This might be ok if the underlying npm libs are few and are not likely to change much - otherwise upgrading will be somewhat painful for users. </p><p>Another consideration if your lib does depend on Cljsjs libraries will be users targeting Node. Unless they are using Shadow, <code>:foreign-libs</code> will be picked up but they work a bit strangely because <a href='https://github.com/clojure/clojurescript-site/issues/320'>every 'require' results in the foreign lib being evaluated</a>, so prepare for some confused users or take steps to mitigate it, as <a href='https://github.com/henryw374/packages/commit/13958337d9ba2e04563c03076bba24be6e1b0921'>I did with js-joda</a>.</p><p>In summary, you can decide if the (potential) users of your lib are likely to be the ones using npm already or not. If they might not use npm, and the Cljsjs dependency tree doesn't look too hairy, then perhaps you would decide to have Cljsjs dependencies for the time being.</p><h1>Authoring</h1><h2>Cljsjs</h2><p>Assuming you do want to package one or more Cljsjs libraries (whether your lib declares a dependencies on them or not), you need to look at packaging 'foreign-libs' that will contain all the code that would have come from npm (if they don't exist already in CLJSJS of course). What makes this code 'foreign' in Cljs parlance is that is not written in Google Closure style (<a href='https://developers.google.com/closure'>Google Closure</a> is a key tool the Clojurescript compiler uses under the hood). The npm code you want to consume may actually be amenable to Dead Code Elimination by Closure but let's ignore that for now.</p><p>Create a library that just packages one npm library and submit a PR to cljsjs. Cljsjs has a helpful <a href='https://github.com/cljsjs/packages/wiki'>wiki</a> with guides and explainers.</p><p>That Cljsjs library will contain a <code>deps.cljs</code> file that looks something like this:</p><pre><code>{:foreign-libs
+ &#91;{:file &quot;cljsjs/js-joda-core/js-joda.inc.js&quot;,
+   :provides &#91;&quot;@js-joda/core&quot;&#93;,
+   :global-exports {&quot;@js-joda/core&quot; JSJoda}}&#93;&#93;
+ :externs &#91;&quot;cljsjs/js-joda/common/js-joda.ext.js&quot;&#93;}
+</code></pre><p>There are more opts you might need, see <a href='https://clojurescript.org/reference/compiler-options#foreign-libs'>the full list here</a> for more info. </p><p>Note though that I am packaging <code>:externs</code> here. Users of your library should use compiler opt <code>:infer-externs true</code>, but for the Cljs.java-time library, that is not sufficient to survive advanced compilation. You can use the <a href='https://github.com/henryw374/clojurescript-library-consumers-test'>library consumers test</a> to see if you need hand-rolled externs for your library or not.</p><p>One important point for npm-compatibility is what you put in <code>:provides</code> and they keys of <code>:global-exports</code> - the name (in this example <code>@js-joda/core</code>) <strong>must exactly match that of the npm package name</strong>.</p><p>With this setup, your library code ns can require the JS lib like so:</p><pre><code>&#40;ns my-cool-lib
+  &#40;:require &#91;&quot;@js-joda/core&quot; :as joda&#93;&#41;&#41;
+  </code></pre><br /><p>Importantly, this require will work for both foreign-lib/Cljsjs users and npm users.<br /></p><p>Now you have a mvn-packaged foreign-lib, your library pom.xml can depend on it as it would any other non-npm lib.</p><h2>Npm</h2><p>Package a <code>deps.cljs</code> file with your lib with contents like this:</p><pre><code>{:npm-deps {&quot;@js-joda/core&quot; &quot;1.12.0&quot;}
+ :externs &#91;&quot;cljsjs/js-joda/common/js-joda.ext.js&quot;&#93;}
+</code></pre><p>This example is from <code>cljs.java-time</code> again and in this case just lists a single npm library and the required  npm version. The same externs file that was packaged with the Cljsjs library is included here as well because the npm-using users of your library will exclude the Cljsjs dependency to avoid getting the foreign-lib as well (Shadow users won't need to as it ignores foreign-libs) but they will still need the externs. </p><p>Note that <code>:npm-deps</code> dependency in deps.cljs is <strong>not</strong> tied to Google Closure processing (it was in the past).</p><h1>How consumers will install your library</h1><p>The best thing I can do to explain the possibilities here is to point you to the <a href='https://github.com/henryw374/clojurescript-library-consumers-test'>library consumers test</a>. This actually demonstrates all of the possible ways your library could be consumed by users targeting browsers and examples of how to do so.</p><p>The test includes an example compiling with <code>:npm-deps true</code> option but if that doesn't work, don't fret, it is <a href='https://clojurescript.org/reference/compiler-options#npm-deps'>not recommended</a></p><h1>Wrap-up</h1><p>React wrappers aside, afaik there aren't that many Cljs libs depending on plain-JS libraries right now - in some cases that might be because it has been seen as complicated, but as this guide shows, it's not rocket science. </p><p>I would advocate a change to Clojurescript that introduces a new compiler opt <code>:use-foreign-libs-from-deps?</code> that defaults to <code>false</code>. That would mean the non-Shadow npm users didn't have to track down and exclude Cljsjs dependencies from their build and hopefully act as a clear statement that Cljsjs is no longer the recommended path.</p><p>The situation for library authors would of course be more straightforward if all Cljs users were using npm, but I guess a signifcant proportion don't. It would be cool if the Clojure survey could track that more precisely. <a href='https://github.com/funcool/cuerdas'>Cuerdas</a> is one such Cljsjs-depending library, and has clearly had <a href='https://github.com/funcool/cuerdas/commit/a8443724e22435e052af4149b27dd2169f3216ac'>some issues</a> when they try to drop the Cljsjs dependency. </p><p>As I say this guide is correct to the best of my knowledge and is something I would have found really helpful when first creating a Clojurescript library. If you have any feedback, corrections etc, I'd love to know!</p><p>& Thanks to David Nolen for explaining some of the finer points to me! </p>
+<p>Discuss this post <a href="https://github.com/henryw374/blog/discussions/categories/posts">here</a>.</p>
+<p><i>Published: 2020-04-17</i></p>
+
+<p>
+  <i>
+  Tagged:
+  
+  <span class="tag">
+    <a href="tags/clojure.html">clojure</a>
+  </span>
+  
+  </i>
+</p>
+
+
+
+      
+      <div style="margin-bottom: 20px; float: right;">
+        <a class="page-link" href="archive.html">Archive</a>
+      </div>
+      
+    </div>
+  </body>
+</html>

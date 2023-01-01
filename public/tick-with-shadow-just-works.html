@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Clojure(Script) date-time libs, Shadow-cljs &amp; Babashka</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type="application/atom+xml" rel="alternate" href="atom.xml" title="Clojure(Script) date-time libs, Shadow-cljs &amp; Babashka">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/components/prism-clojure.min.js"></script>
+    <script type="text/javascript" src="https://livejs.com/live.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism.min.css">
+
+
+
+    <!-- Social sharing (Facebook, Twitter, LinkedIn, etc.) -->
+    <meta name="title" content="Clojure(Script) date-time libs, Shadow-cljs &amp; Babashka">
+    <meta name="twitter:title" content="Clojure(Script) date-time libs, Shadow-cljs &amp; Babashka">
+    <meta property="og:title" content="Clojure(Script) date-time libs, Shadow-cljs &amp; Babashka">
+    <meta property="og:type" content="website">
+
+
+    <meta name="twitter:url" content="https://blog.widdindustries.com/tick-with-shadow-just-works.html">
+    <meta property="og:url" content="https://blog.widdindustries.com/tick-with-shadow-just-works.html">
+
+
+    <meta name="twitter:card" content="summary">
+
+
+    <meta name="twitter:creator" content="henryw374">
+
+
+    <meta name="twitter:site" content="henryw374">
+
+  </head>
+  <body>
+
+    <div class="site-header">
+      <div class="wrapper">
+        <div class="site-nav">
+          <a class="page-link" href="archive.html">Archive</a>
+          <a class="page-link" href="tags/index.html">Tags</a>
+          <a class="page-link" href="https://github.com/henryw374/blog/discussions/categories/posts">Discuss</a>
+	  <a class="page-link" href="atom.xml">
+            Feed
+          </a>
+	  
+	  <a class="page-link" href="https://twitter.com/henryw374">
+            Twitter
+          </a>
+	  
+	  
+	  <a class="page-link" href="https://widdindustries.com/about">About</a>
+	  
+        </div>
+        <div>
+          <h1 class="site-title">
+            <a class="page-link" href="index.html">Henry Widd&#39;s Blog</a>
+          </h1>
+	  <p>Miscellania</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrapper">
+
+      <h1>
+  
+  Clojure(Script) date-time libs, Shadow-cljs &amp; Babashka
+  
+</h1>
+<h1>Time libs on npm/Shadow</h1><p><a href='https://github.com/juxt/tick'>tick</a> is a Clojure(Script) library for working with time. <a href='https://github.com/henryw374/cljc.java-time'>cljc.java-time</a> is used by tick and provides a cross-platform version of the java.time api. </p><p>In the latest releases, these 'just work' on Shadow-cljs, for example:</p><pre><code>echo '{:deps { tick {:mvn/version &quot;0.4.25-alpha&quot;} thheller/shadow-cljs {:mvn/version &quot;2.9.8&quot;} }}' &gt; deps.edn
+echo '{:deps {}}' &gt; shadow-cljs.edn
+echo '{}' &gt; package.json
+
+npm install shadow-cljs --save-dev &amp;&amp; npx shadow-cljs browser-repl
+</code></pre><p>In the repl:</p><pre><code>cljs.user=&gt; &#40;require '&#91;tick.alpha.api :as t&#93;&#41;
+nil
+cljs.user=&gt; &#40;t/today&#41;
+#time/date &quot;2020-05-31&quot;
+
+</code></pre><p>Why is this news? Well, previously Shadow and other npm-using Clojurescript users of Tick/cljc.java-time had to include an extra shim library and manually include the js-joda dependencies in their package.json. A desire to move to the latest (and now scope-named) '@js-joda/core' packages, <a href='https://clojure.atlassian.net/browse/CLJS-3138'>a fix in the latest Clojurescript release</a> and an increase in my understanding of <a href='http://widdindustries.com/cljs-npm-libraries/'>how to package Clojurescript libraries</a> has resulted in these improvements. Note, there are still a few <a href='https://github.com/juxt/tick/blob/master/docs/cljs.adoc'>need-to-knows for Clojurescript users</a>, but not too many!</p><h1>Babashka</h1><p>In other news <a href='https://github.com/henryw374/cljc.java-time'>cljc.java-time</a> now works on a third platform, <a href='https://github.com/borkdude/babashka/'>babashka</a>!</p>
+<p>Discuss this post <a href="https://github.com/henryw374/blog/discussions/categories/posts">here</a>.</p>
+<p><i>Published: 2020-05-31</i></p>
+
+<p>
+  <i>
+  Tagged:
+  
+  <span class="tag">
+    <a href="tags/clojure.html">clojure</a>
+  </span>
+  
+  </i>
+</p>
+
+
+
+      
+      <div style="margin-bottom: 20px; float: right;">
+        <a class="page-link" href="archive.html">Archive</a>
+      </div>
+      
+    </div>
+  </body>
+</html>

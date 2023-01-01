@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Progress update on the Clojure(Script) date-time libraries</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type="application/atom+xml" rel="alternate" href="atom.xml" title="Progress update on the Clojure(Script) date-time libraries">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/components/prism-clojure.min.js"></script>
+    <script type="text/javascript" src="https://livejs.com/live.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism.min.css">
+
+
+
+    <!-- Social sharing (Facebook, Twitter, LinkedIn, etc.) -->
+    <meta name="title" content="Progress update on the Clojure(Script) date-time libraries">
+    <meta name="twitter:title" content="Progress update on the Clojure(Script) date-time libraries">
+    <meta property="og:title" content="Progress update on the Clojure(Script) date-time libraries">
+    <meta property="og:type" content="website">
+
+
+    <meta name="twitter:url" content="https://blog.widdindustries.com/clojure-time-libs-update.html">
+    <meta property="og:url" content="https://blog.widdindustries.com/clojure-time-libs-update.html">
+
+
+    <meta name="twitter:card" content="summary">
+
+
+    <meta name="twitter:creator" content="henryw374">
+
+
+    <meta name="twitter:site" content="henryw374">
+
+  </head>
+  <body>
+
+    <div class="site-header">
+      <div class="wrapper">
+        <div class="site-nav">
+          <a class="page-link" href="archive.html">Archive</a>
+          <a class="page-link" href="tags/index.html">Tags</a>
+          <a class="page-link" href="https://github.com/henryw374/blog/discussions/categories/posts">Discuss</a>
+	  <a class="page-link" href="atom.xml">
+            Feed
+          </a>
+	  
+	  <a class="page-link" href="https://twitter.com/henryw374">
+            Twitter
+          </a>
+	  
+	  
+	  <a class="page-link" href="https://widdindustries.com/about">About</a>
+	  
+        </div>
+        <div>
+          <h1 class="site-title">
+            <a class="page-link" href="index.html">Henry Widd&#39;s Blog</a>
+          </h1>
+	  <p>Miscellania</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrapper">
+
+      <h1>
+  
+  Progress update on the Clojure(Script) date-time libraries
+  
+</h1>
+<p>In April 2019 I gave a <a href='https://www.youtube.com/watch?v=UFuL-ZDoB2U'>talk at Clojure/North</a> providing my motivation for working on new date-time libraries: <code>cljc.java-time</code>, <code>time-literals</code> and <code>tick</code>. Yes, you heard right, yet more date-time libraries! In the talk I argue that they provide novelty with respect to cross-platform development and improve the overall situation for Clojurescript date-time work. This post gives some updates on what has happened since and considers future developments for these libraries.</p><p>It's always hard to know how much usage open source projects are getting, but these young libraries are definitely seeing some healthy activity in terms of Github issues, contributions and stars. As expected, tick has had the majority of activity, but I'm aware of people using the ancillary libs in isolation too. </p><p>For the rest of the post I'll talk about the todo list that I presented in the Clojure/North talk, how it has progressed and what's new on the list. I'd welcome PRs on any of these items but if you want any of them expedited by myself then please <a href='http://widdindustries.com/about/'>get in touch</a> </p><h1><a href='https://github.com/henryw374/time-literals'>Time Literals</a></h1><p>Useful to any Clojurist working with java.time, either with or without a wrapper library. java.time entities are printed as tagged literals that can be pasted back in to the REPL, written to files, sent over the wire and so on. </p><p>Examples:</p><pre><code> #time/date&quot;1969-07-20&quot;
+ #time/time&quot;20:17&quot;
+</code></pre><h2>Todo</h2><p>There has been some interest in having Transit encodings using the literals. Support for the <code>datafy/nav</code> is another possible feature, but although it has a similar theme of representing data, it isn't that closely related to <code>time-literals</code> so might live in a separate repo.</p><h1><a href='https://github.com/henryw374/cljc.java-time'>cljc.java-time</a></h1><p>This is a  Clojure(Script) library that mirrors the java.time api through kebab-case-named vars. </p><pre><code>&#40;ns my.cljc
+  &#40;:require  &#91;cljc.java-time.local-date :as ld&#93;&#41;
+  
+  ;create a date
+  &#40;def a-date &#40;ld/parse &quot;2019-01-01&quot;&#41;&#41;
+  
+  ;add some days
+  &#40;ld/plus-days a-date 99&#41;
+</code></pre><h2>Progress</h2><p>As this library only aims to mirror java.time and is generated from it, the api was essentially 'done' on the first release. The type hinting has been improved since then, thanks to work which has now become <a href='https://github.com/emlyn/tortilla'>Tortilla</a>)</p><p>Having (clojure.spec) specs and generators for java.time is something I <a href='https://github.com/henryw374/time-literals'>made a start</a> on, but while spec itself is changing then any lib using it is going to be subject to the same flux. There has been some interest in having <a href='https://github.com/metosin/malli'>Malli</a> use cljc.java-time for it's date and time logic, but IMO cljc.java-time brings too much baggage on the Clojurescript side - although read on to the next section for a possible way through for this and other libraries.</p><p>Whatever direction these specification efforts take, a set of predicate functions for the java.time entities is a generally useful thing and a recent contribution to cljc.java-time added instance predicates for all java.time entities, for example <code>&#40;date? x&#41;</code>. </p><p>The other <a href='https://github.com/henryw374/cljc.java-time/issues'>open issues</a> are about listing discrepancies between the underlying time libs and wrapping the further flung corners of java.time.</p><h1><a href='https://github.com/henryw374/cljs.java-time'>cljs.java-time</a></h1><p>This Clojurescript library is used by <code>cljc.java-time</code> (see above). It exposes the npm library <a href='https://github.com/js-joda/js-joda'>Js-Joda</a> (a faithful and mostly complete JS implementation of java.time) and extends the Clojurescript equivalence, comparison and hashing protocols to its entitites.</p><p>Because js-joda existed, it was a relatively small step to make a cross-platform time library, but although it is an enabler it is also something of a hindrance for two main reasons:</p><p>1) The myriad ways Clojurescript users consume npm libraries</p><p>2) It's size (minimum of 43k, gzipped)</p><p>On point 1), making a Clojurescript library that uses an npm lib sometimes feels a bit like being in the wild west, but at the end of the day, whatever setup you have it's not too hard to get this library working and if you can consume foreign-libs, it 'just works' out of the box. Having a single command that will drop you into a node repl with tick is pretty cool, for example:</p><pre><code>clj -Sdeps '{:deps {org.clojure/clojurescript {:mvn/version &quot;1.10.597&quot; } tick {:mvn/version &quot;0.4.23-alpha&quot;} }}' -m cljs.main  -re node  --repl
+</code></pre><p>Regarding point 2), I would say that in many contexts (including client projects I am currently engaged in) the size is simply not an issue when trading off </p><ul><li>utility</li><li>overall build size</li><li>actual end user's experience</li></ul><p>In other contexts the size would be a problem though. I have briefly looked into reducing its size through minification & Dead Code Elimination and although I've made a little progress I don't think it's going to be possible to reduce it enough to bring it down hugely or to be on a par with <code>goog.date</code>.</p><p>These two issues together mean that <code>cljs.java-time</code> & related libs probably aren't going to be used by other Clojure(Script) libraries needing date/time functions.</p><p>I'd say the best looking solution on the horizon is the new platform date-time library being developed for Javascript aka <a href='https://github.com/tc39/proposal-temporal'>tc-39/proposal-temporal</a> (hereafter PT). If JS had a good date-time api built-in then it wouldn't be necessary to bring your own of course, so no need for Js-Joda and problems 1) and 2) go away, simples!</p><p>The PT api is currently being finalized and experimental work is underway to reimplement <a href='https://github.com/moment/moment'>Moment.js</a> with it. How far away it is from being included in the next version of Node, Chrome etc I really can't say. Even when it is there, the world's browsers won't get upgraded overnight so polyfills will be needed for some time in many cases. </p><p>That aside, what does PT look like? Unfortunately from a cross-platform lib developer's PoV it is not that similar to java.time. Some obvious differences are naming and the entities where methods reside. Also there is no ZonedDateTime and the Duration and Period classes have been combined. However, although it looks pretty different, my feeling is that the differences are quite superficial. If you wanted a cross platform Clojure api that used PT and java.time, I think extending tick's protocols to the PT entities would likely be a good starting point, so you might end up with a <code>tick-lite</code> that doesn't use js-joda or any npm lib.</p><h1><a href='https://github.com/juxt/tick'>tick</a></h1><p>This is a <a href='https://juxt.pro/index.html'>Juxt</a> library that I made cross-platform and am now helping to maintain. I'll try to briefly describe it as having the following features: </p><p>1) A single-ns, intuitive api over java.time</p><p>2) Batteries-included - it depends on and configures <code>cljc.java-time</code>, <code>time-literals</code> & additional js-joda locale & timezone libs</p><p>3) Power tools - Interval Algebra and Scheduling</p><p>Unsurprisingly <code>tick</code> appears to have the most traction of all the libs (despite its alpha status) and it's been great to see a number of bug fixes and minor contributions from the community since April.</p><p>In the main api the things I'd most like to be addressed include:</p><ul><li>parsing (defer to DateTimeFormatter entirely)</li><li>another look at <code>&gt;&gt;/&lt;&lt;</code> vs <code>+/-</code> and <code>range</code></li><li>more <a href='https://juxt.pro/tick/docs/index.html'>documentation of tick</a>.</li></ul><p>See the full list of <a href='https://github.com/juxt/tick/issues'>issues</a> for other open items.</p><h1>Conclusion</h1><p>It has been good to see a positive response to the talk and the libraries. In summary, there have been some minor bug fixes & tweaks since April, but I've outlined what I see as some potential features that could exist in future - if people want them! As I say, I'd welcome PRs on any of these items but if you want any of them expedited by myself then please <a href='http://widdindustries.com/about/'>get in touch</a>.  <br /></p>
+<p>Discuss this post <a href="https://github.com/henryw374/blog/discussions/categories/posts">here</a>.</p>
+<p><i>Published: 2020-01-05</i></p>
+
+<p>
+  <i>
+  Tagged:
+  
+  <span class="tag">
+    <a href="tags/clojure.html">clojure</a>
+  </span>
+  
+  </i>
+</p>
+
+
+
+      
+      <div style="margin-bottom: 20px; float: right;">
+        <a class="page-link" href="archive.html">Archive</a>
+      </div>
+      
+    </div>
+  </body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Tick is out of alpha!</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type="application/atom+xml" rel="alternate" href="atom.xml" title="Tick is out of alpha!">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/components/prism-clojure.min.js"></script>
+    <script type="text/javascript" src="https://livejs.com/live.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism.min.css">
+
+
+
+    <!-- Social sharing (Facebook, Twitter, LinkedIn, etc.) -->
+    <meta name="title" content="Tick is out of alpha!">
+    <meta name="twitter:title" content="Tick is out of alpha!">
+    <meta property="og:title" content="Tick is out of alpha!">
+    <meta property="og:type" content="website">
+
+
+    <meta name="twitter:url" content="https://blog.widdindustries.com/tick-is-out-of-alpha.html">
+    <meta property="og:url" content="https://blog.widdindustries.com/tick-is-out-of-alpha.html">
+
+
+    <meta name="twitter:card" content="summary">
+
+
+    <meta name="twitter:creator" content="henryw374">
+
+
+    <meta name="twitter:site" content="henryw374">
+
+  </head>
+  <body>
+
+    <div class="site-header">
+      <div class="wrapper">
+        <div class="site-nav">
+          <a class="page-link" href="archive.html">Archive</a>
+          <a class="page-link" href="tags/index.html">Tags</a>
+          <a class="page-link" href="https://github.com/henryw374/blog/discussions/categories/posts">Discuss</a>
+	  <a class="page-link" href="atom.xml">
+            Feed
+          </a>
+	  
+	  <a class="page-link" href="https://twitter.com/henryw374">
+            Twitter
+          </a>
+	  
+	  
+	  <a class="page-link" href="https://widdindustries.com/about">About</a>
+	  
+        </div>
+        <div>
+          <h1 class="site-title">
+            <a class="page-link" href="index.html">Henry Widd&#39;s Blog</a>
+          </h1>
+	  <p>Miscellania</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrapper">
+
+      <h1>
+  
+  Tick is out of alpha!
+  
+</h1>
+<p><a href='https://github.com/juxt/tick'>Tick</a> provides a powerful, cross-platform date-time API way beyond what  java.time offers. It is implemented on top of <a href='https://github.com/henryw374/cljc.java-time'>cljc.java-time</a> which again is cross-platform as has exactly the same API as java.time.</p><p>For years now, the API has been <code>alpha</code>, by which we mean "Ready to use with the caveat that the API might still  undergo minor changes". With the current release, the API of tick has been split into </p><ul><li>a <code>tick.core</code> namespace, which will have no breaking changes in future releases</li><li>a <code>tick.alpha.interval</code> namespace, which contains just the functions pertaining to Allen's intervalcalculus. As its name suggests, this is still alpha. Apologies if the title of this post is misleading, I didn't want to stuff it with caveats.</li></ul><p>There are plans to revisit the interval functions and documentation and some changes to the API may arise from that work.</p><p>If you are upgrading from an earlier (0.4* version), here is what needs to change:</p><ul><li>replace all <code>tick.alpha.api</code> requires with <code>tick.core</code></li><li>If you used the <code>+</code> or <code>-</code> functions, note that these now only work where the arguments are allPeriods or all Durations. To move a time by an amount, use <code>&gt;&gt;</code> or <code>&lt;&lt;</code> instead, keeping the arguments the same. This change was made to make +/- analagous to clojure.core's +/-, where the arguments are commutative andassociative. It also means there is now just one way to 'move' a time in Tick.</li><li>The <code>parse</code> function has now been removed from the API. Instead, choose the appropriate function for theformat of the string you need to parse, e.g. <code>&#40;t/date &quot;2020-02-02&quot;&#41;</code>. The parse function was slow by definition, as it tried to find an appropriate entity matching the string it was given. It also meant that iffor some reason the string you passed it was not in the format you expected, it might be parsed intoa different date-time entity than you expected, which is never going to be good.</li><li>The compiler will report about any other functions not found in tick.core. Those will be the interval ones,so adding a require of <code>tick.alpha.interval</code> will address those.</li></ul><p>That's it. </p><p>Making breaking changes may be frowned on in the Clojure community, but they seem entirely reasonable to me in this case because:</p><ul><li>The api always had an <code>alpha</code> warning.</li><li>There is no obligation to upgrade. Tick is an <code>end-user</code> kind of library: I doubt any other libsdepend on it, so dependency hell is not an issue.</li></ul><p>One last thing, the current version is <code>RC</code>, release candidate. IOW please kick the tyres and let us know of any problems. We have already been using it in production for a while, with no issues. After a  period of a couple of months, we'll remove the RC label.<br /></p> 
+<p>Discuss this post <a href="https://github.com/henryw374/blog/discussions/categories/posts">here</a>.</p>
+<p><i>Published: 2021-09-28</i></p>
+
+<p>
+  <i>
+  Tagged:
+  
+  <span class="tag">
+    <a href="tags/clojure.html">clojure</a>
+  </span>
+  
+  </i>
+</p>
+
+
+
+      
+      <div style="margin-bottom: 20px; float: right;">
+        <a class="page-link" href="archive.html">Archive</a>
+      </div>
+      
+    </div>
+  </body>
+</html>

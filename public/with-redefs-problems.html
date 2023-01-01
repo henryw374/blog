@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>When to avoid with-redefs</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type="application/atom+xml" rel="alternate" href="atom.xml" title="When to avoid with-redefs">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/components/prism-clojure.min.js"></script>
+    <script type="text/javascript" src="https://livejs.com/live.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism.min.css">
+
+
+
+    <!-- Social sharing (Facebook, Twitter, LinkedIn, etc.) -->
+    <meta name="title" content="When to avoid with-redefs">
+    <meta name="twitter:title" content="When to avoid with-redefs">
+    <meta property="og:title" content="When to avoid with-redefs">
+    <meta property="og:type" content="website">
+
+
+    <meta name="twitter:url" content="https://blog.widdindustries.com/with-redefs-problems.html">
+    <meta property="og:url" content="https://blog.widdindustries.com/with-redefs-problems.html">
+
+
+    <meta name="twitter:card" content="summary">
+
+
+    <meta name="twitter:creator" content="henryw374">
+
+
+    <meta name="twitter:site" content="henryw374">
+
+  </head>
+  <body>
+
+    <div class="site-header">
+      <div class="wrapper">
+        <div class="site-nav">
+          <a class="page-link" href="archive.html">Archive</a>
+          <a class="page-link" href="tags/index.html">Tags</a>
+          <a class="page-link" href="https://github.com/henryw374/blog/discussions/categories/posts">Discuss</a>
+	  <a class="page-link" href="atom.xml">
+            Feed
+          </a>
+	  
+	  <a class="page-link" href="https://twitter.com/henryw374">
+            Twitter
+          </a>
+	  
+	  
+	  <a class="page-link" href="https://widdindustries.com/about">About</a>
+	  
+        </div>
+        <div>
+          <h1 class="site-title">
+            <a class="page-link" href="index.html">Henry Widd&#39;s Blog</a>
+          </h1>
+	  <p>Miscellania</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrapper">
+
+      <h1>
+  
+  When to avoid with-redefs
+  
+</h1>
+<p><a href='https://clojuredocs.org/clojure.core/with-redefs'>with-redefs</a> is a handy clojure.core function to use when you want to redefine one or more vars temporarily (within a block) and you want these redefinitions to apply across thread boundaries</p><p>An alternative for doing something similar is <a href='https://clojuredocs.org/clojure.core/with-bindings'>with-bindings</a>, and that is slightly different in that the new bindings are only seen within the context of the current thread. If for example, you use with-bindings on a var and the value of the var is referenced when doing a <code>clojure.core/map</code> operation say, then it is possible you won't see the temp binding, since <code>map</code> is lazy and may be executed in a different thread.</p><p>Also, <code>with-bindings</code> requires the rebound vars are dynamic. </p><p>So... with-redefs is generally a more powerful go-to tool than with-bindings?</p><p>No, <code>with-bindings</code> is more generally used on vars that are planned to get rebound, whereas <code>with-redefs</code> is intended when you want to change the way things normally work, for example when you're running a test and decide you don't really want to call an external system, and can use with-redefs to stub.</p><p>However, beware that <code>with-redefs</code> is not foolproof. Consider rebinding a function foo</p><pre><code>&#40;with-redefs &#91;a.b.c/foo my-temp-fn&#93;
+  ... body that calls foo at some point, possibly from another thread&#41;
+</code></pre><p>Will the body here always see your temp binding?</p><p><strong>No</strong></p><p>Why not?</p><p>Well, interleaved threads is one situation. </p><p>Let's say this code is called from two threads and this is the order of events:</p><p>Thread A executes the <code>with-redefs</code></p><p>Thread B executes the <code>with-redefs</code></p><p>Thread A executes the body and exits the <code>with-redefs</code> block (thereby restoring the root binding of foo)</p><p>Thread B now executes the body and does not see the temp binding!!</p><p>The docs for <code>with-redefs</code> say this is handy for tests, which implies that if you want to change a var in non-test code, then <code>alter-var-root</code> (assuming it is done once, on startup) is the way to go. </p><p>However, there's nothing to stop you hitting an interleaving problem in tests unless you are running your tests serially and the with-redef wraps the test body. There isn't a <code>with-redefs-visible-only-via-this-block</code> or equivalent.</p><h3>Conclusion:</h3><p>Use <code>with-redefs</code> cautiously. Remember this blog post when scratching your head about why some code is not seeing a temp binding.</p>
+<p>Discuss this post <a href="https://github.com/henryw374/blog/discussions/categories/posts">here</a>.</p>
+<p><i>Published: 2019-01-07</i></p>
+
+<p>
+  <i>
+  Tagged:
+  
+  <span class="tag">
+    <a href="tags/clojure.html">clojure</a>
+  </span>
+  
+  </i>
+</p>
+
+
+
+      
+      <div style="margin-bottom: 20px; float: right;">
+        <a class="page-link" href="archive.html">Archive</a>
+      </div>
+      
+    </div>
+  </body>
+</html>

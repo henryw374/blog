@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Less Boilerplate in Cljs Async Tests</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type="application/atom+xml" rel="alternate" href="atom.xml" title="Less Boilerplate in Cljs Async Tests">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/components/prism-clojure.min.js"></script>
+    <script type="text/javascript" src="https://livejs.com/live.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism.min.css">
+
+
+
+    <!-- Social sharing (Facebook, Twitter, LinkedIn, etc.) -->
+    <meta name="title" content="Less Boilerplate in Cljs Async Tests">
+    <meta name="twitter:title" content="Less Boilerplate in Cljs Async Tests">
+    <meta property="og:title" content="Less Boilerplate in Cljs Async Tests">
+    <meta property="og:type" content="website">
+
+
+    <meta name="twitter:url" content="https://blog.widdindustries.com/cljs-async-tests.html">
+    <meta property="og:url" content="https://blog.widdindustries.com/cljs-async-tests.html">
+
+
+    <meta name="twitter:card" content="summary">
+
+
+    <meta name="twitter:creator" content="henryw374">
+
+
+    <meta name="twitter:site" content="henryw374">
+
+  </head>
+  <body>
+
+    <div class="site-header">
+      <div class="wrapper">
+        <div class="site-nav">
+          <a class="page-link" href="archive.html">Archive</a>
+          <a class="page-link" href="tags/index.html">Tags</a>
+          <a class="page-link" href="https://github.com/henryw374/blog/discussions/categories/posts">Discuss</a>
+	  <a class="page-link" href="atom.xml">
+            Feed
+          </a>
+	  
+	  <a class="page-link" href="https://twitter.com/henryw374">
+            Twitter
+          </a>
+	  
+	  
+	  <a class="page-link" href="https://widdindustries.com/about">About</a>
+	  
+        </div>
+        <div>
+          <h1 class="site-title">
+            <a class="page-link" href="index.html">Henry Widd&#39;s Blog</a>
+          </h1>
+	  <p>Miscellania</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrapper">
+
+      <h1>
+  
+  Less Boilerplate in Cljs Async Tests
+  
+</h1>
+<p>I can mostly avoid async tests for my re-frame cljs apps. Even integration-style tests that  use <a href='https://github.com/airbnb/enzyme'>enzyme</a> or <a href='https://github.com/testing-library/react-testing-library'>react-testing-library</a>  can be made synchronous (if using Re-frame), by using <code>day8.re-frame.test/run-test-sync</code> and faking server responses  with synchronous promises. This is nice because they're easier to understand and debug.  Sometimes though, async is necessary. </p><p>The Clojurescript site describes <a href='https://clojurescript.org/tools/testing'>how to do async tests</a> using the <code>cljs.test/async</code> macro and Re-frame has a nice <code>run-test-async</code> wrapper around that. </p><p>If you are using <code>cljs.test/async</code> you have to make sure your test code calls the <code>done</code> function in every case, including  on errors, timeout etc. So to remove some boilerplate, here's a new <a href='https://github.com/henryw374/Cljs-Async-Timeout-Tests'>utility</a> which provides a macro like <code>cljs.test/async</code>, but which on timeout or uncaught failure (exception or failed promise), will fail the test,  calling the <code>done</code> function for you.</p><p>Here's how you'd use it:</p><pre><code>&#40;ns myns.ns
+  &#40;:require &#91;clojure.test :refer &#91;is deftest&#93;&#93;
+            &#91;widdindustries.timeout-test :refer &#91;async-timeout async-timeout-at&#93;&#93;&#41;&#41;
+
+&#40;deftest my-test
+  &#40;async-timeout done 
+     ;; do some stuff that will call `done` when it succeeds.
+     ;; lib expects any async body will result in a promise
+   &#41;&#41;
+</code></pre><p>If you have any feedback please comment or raise an issue.</p><p>Henry</p>
+<p>Discuss this post <a href="https://github.com/henryw374/blog/discussions/categories/posts">here</a>.</p>
+<p><i>Published: 2019-09-04</i></p>
+
+<p>
+  <i>
+  Tagged:
+  
+  <span class="tag">
+    <a href="tags/clojure.html">clojure</a>
+  </span>
+  
+  </i>
+</p>
+
+
+
+      
+      <div style="margin-bottom: 20px; float: right;">
+        <a class="page-link" href="archive.html">Archive</a>
+      </div>
+      
+    </div>
+  </body>
+</html>

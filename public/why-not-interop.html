@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Why not Interop with java.time?</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type="application/atom+xml" rel="alternate" href="atom.xml" title="Why not Interop with java.time?">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/components/prism-clojure.min.js"></script>
+    <script type="text/javascript" src="https://livejs.com/live.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism.min.css">
+
+
+
+    <!-- Social sharing (Facebook, Twitter, LinkedIn, etc.) -->
+    <meta name="title" content="Why not Interop with java.time?">
+    <meta name="twitter:title" content="Why not Interop with java.time?">
+    <meta property="og:title" content="Why not Interop with java.time?">
+    <meta property="og:type" content="website">
+
+
+    <meta name="twitter:url" content="https://blog.widdindustries.com/why-not-interop.html">
+    <meta property="og:url" content="https://blog.widdindustries.com/why-not-interop.html">
+
+
+    <meta name="twitter:card" content="summary">
+
+
+    <meta name="twitter:creator" content="henryw374">
+
+
+    <meta name="twitter:site" content="henryw374">
+
+  </head>
+  <body>
+
+    <div class="site-header">
+      <div class="wrapper">
+        <div class="site-nav">
+          <a class="page-link" href="archive.html">Archive</a>
+          <a class="page-link" href="tags/index.html">Tags</a>
+          <a class="page-link" href="https://github.com/henryw374/blog/discussions/categories/posts">Discuss</a>
+	  <a class="page-link" href="atom.xml">
+            Feed
+          </a>
+	  
+	  <a class="page-link" href="https://twitter.com/henryw374">
+            Twitter
+          </a>
+	  
+	  
+	  <a class="page-link" href="https://widdindustries.com/about">About</a>
+	  
+        </div>
+        <div>
+          <h1 class="site-title">
+            <a class="page-link" href="index.html">Henry Widd&#39;s Blog</a>
+          </h1>
+	  <p>Miscellania</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrapper">
+
+      <h1>
+  
+  Why not Interop with java.time?
+  
+</h1>
+<p>Using interop syntax with the java.time API is not wrong, but there is an alternative that is superior in every respect - and it just got much better.</p><p>Some in the Clojure community would say that if a Java or JS API is good, then it needn't be  'wrapped' in a library, because plain interop code is idiomatic and any wrapping library might:</p><ul><li>Miss out something of the underlying API (so you likely need to know both anyway)</li><li>Have fewer tests/documentation/community etc</li><li>Introduce some subtle new semantics</li><li>Not keep up with releases of the underlying</li></ul><p>Those concerns all seem reasonable, but consider <a href='https://github.com/henryw374/cljc.java-time'>this java.time wrapper</a>. Every one of the above concerns is addressed: The Clojure API is identical to the underlying Java API (addresses first 3 points) and the underlying API is stable (last point).</p><p>Okaaaay ... but if it's so similar, why use it at all?</p><p>The library's main reason to exist is because it works cross-platform, a huge win on my current projects - but let's leave that aside for the moment and consider the  jvm-only POV.</p><h2>Camel->Kebab wrapping benefits</h2><ul><li>All type hinting is done for you</li><li>comp, apply, juxt and all other clojure.core higher-order fns can now be used rather than anon fn interop: <code>#&#40;.bar %&#41;</code></li><li>In fact, instead of seeing code like <code>#&#40;.isAfter %&#41;</code>, you'll use a properly namespaced clojure function <code>x.y/is-after</code> - much better!</li><li>The Javadoc of the original API will be more readily available via Clojure docstrings (see <a href='https://github.com/henryw374/cljc.java-time/issues/16'>issue</a>)</li></ul><h2>Additional API</h2><ul><li>Predicates, for example <code>&#40;local-date? x&#41;</code></li></ul><p>This could be used for spec definitions for example.</p><h2>Exceptions That Say Something Helpful</h2><p>This is a very recent addition (<a href='https://clojars.org/cljc.java-time'>0.1.12</a> and takes a bit of explaining. In java.time, you have an <code>Instant</code> which is equivalent to a <code>java.util.Date</code> in that it's instances represent <code>the start of a nanosecond on the timeline</code>. Now the tricky thing about Instants is that the only field/data they contain is an offset from the UNIX Epoch (midnight, Jan 1st 1970, UTC). Instants know nothing about years, months, days, hours etc etc. In the lingo, they are not 'calendar-aware', so you cannot add a year to an Instant or ask for it's day of the week. BUT... the API kind of suggests that might be possible. </p><p>Firstly, let's see the output of <code>Instant#toString</code>:</p><pre><code class="lang-java">2013-05-30T23:38:23.085Z
+</code></pre><p>Hold on, how and why is that printing years, months & etc? Well, an Instant can be converted into a calendar representation and  that's what the <code>toString&#40;&#41;</code> implementation does. That auto-conversion is the exception rather than the rule though, if you try to format an Instant as 'yyyy-mm-dd' you'll see what I mean.</p><p>On a related note, try adding a year to an Instant: </p><pre><code class="lang-clojure">&#40;-&gt; &#40;Instant/now&#41;
+    &#40;.plus 1 ChronoUnit/YEARS&#41;&#41;
+</code></pre><p>It compiles ok, but at runtime you'll get a run-time exception: <code>Unsupported Field : YearOfEra</code>. </p><p>So what's the problem here? People should just learn this basic fact about the java.time API before using it, right?</p><p>In practice, I see this issue about Instant and calendar-awareness come up a lot - via colleagues, github issues, stackoverflow & etc</p><p>My guess is that a lot of people only need to work with dates infrequently enough that they don't feel it's worth investing time going through the tutorials, or if they do, the nuances quickly fade through lack of practice.</p><p>Having seen this problem in the wild again and again for many years I have decided to take action! </p><p>If you now do some erroneous thing with Instant in cljc.java-time, like this:</p><pre><code>&#40;-&gt; &#40;cljc.java-time.instant/now&#41;
+    &#40;cljc.java-time.instant/plus 1 cljc.java-time.temporal.chrono-unit/years&#41;&#41;
+</code></pre><p>You get an exception with message:</p><pre><code>Hi there! - It looks like you might be trying to do something with a java.time.Instant that would require it to be 'calendar-aware', 
+but since it isn't, it has no facility with working with years, months, days etc. 
+To get around that, consider converting the Instant to a ZonedDateTime first or for formatting/parsing specifically, 
+you might add a zone to your formatter. see https://stackoverflow.com/a/27483371/1700930. 
+ 
+You can disable these custom exceptions by setting -Dcljc.java-time.disable-helpful-exception-messages=true
+</code></pre><p>That message alone should at least prevent a lot of github issues and questions I get .... let's see!</p><p>I am adding that message because I think it's unlikely I could get java.time messages changed, I don't even  know how I would do that. I do know how to make this suggestion for the new date-time API being made for the world's most popular programming language though, raise <a href='https://github.com/tc39/proposal-temporal/issues/1233'>an issue!</a>. That improved error message may be my greatest contribution to humanity to date ;-)</p><h1>What about traditional wrappers like tick or clojure.java-time ?</h1><p>These are traditional wrappers and definitely come with trade-offs. In my work we use date logic a lot, which I think means it's an environment where it's worth learning to use a wrapper because of the extra+improved API. That being said, I use a wrapper for 80% of  regular date-arithmetic - for things I consider more obscure or esoteric, or where performance might suffer, I drop to cljc.java-time (which tick is using under the hood) - and in very rare cases - plain interop.</p><p>If you have any thoughts/questions, please let me know ;-)</p>
+<p>Discuss this post <a href="https://github.com/henryw374/blog/discussions/categories/posts">here</a>.</p>
+<p><i>Published: 2021-01-04</i></p>
+
+<p>
+  <i>
+  Tagged:
+  
+  <span class="tag">
+    <a href="tags/clojure.html">clojure</a>
+  </span>
+  
+  <span class="tag">
+    <a href="tags/date-time.html">date-time</a>
+  </span>
+  
+  </i>
+</p>
+
+
+
+      
+      <div style="margin-bottom: 20px; float: right;">
+        <a class="page-link" href="archive.html">Archive</a>
+      </div>
+      
+    </div>
+  </body>
+</html>
