@@ -5,6 +5,7 @@
           org.babashka/cli {:mvn/version "0.3.35"}}
    :main-opts ["-m" "babashka.cli.exec" "quickblog.cli" "run"]
    :exec-args {:blog-title "Henry Widd's Blog"
+               :blog-author "Henry Widd"
                :blog-description "Miscellania"
                :blog-root "https://widdindustries.com/blog"
                :out-dir "docs"
