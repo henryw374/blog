@@ -6,8 +6,8 @@
    :main-opts ["-m" "babashka.cli.exec" "quickblog.cli" "run"]
    :exec-args {:blog-title "Henry Widd's Blog"
                :blog-description "Miscellania"
-               :blog-root "https://blog.widdindustries.com"
-               :out-dir "public"
+               :blog-root "https://widdindustries.com/blog"
+               :out-dir "docs"
                :about-link "https://widdindustries.com/about"
                :discuss-link "https://github.com/henryw374/blog/discussions/categories/posts"
                :twitter-handle "henryw374"}}}}
