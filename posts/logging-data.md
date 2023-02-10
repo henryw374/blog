@@ -23,7 +23,7 @@ Released since I made that review, and created as a result of log4shell is [Ampe
 
 # Logging from Library Code
 
-Log4j2 is a 'logging implementation' or 'backend'. Ideally one would write log statements against a logging abstraction, where log statements get channeled to whatever logging backend is in place. This is especially important when writing library code. Users of e.g. [Carmine](https://github.com/ptaoussanis/carmine) users will find logs coming via Timbre whether they like it or not. 
+Log4j2 is a 'logging implementation' or 'backend'. Ideally one would write log statements against a logging abstraction, where log statements get channeled to whatever logging backend is in place. This is especially important when writing library code. Users of e.g. [Carmine](https://github.com/ptaoussanis/carmine) will find logs coming via Timbre whether they like it or not. 
 
 Looking at the options here, assuming we want to log data ofc, MuLog might be a choice. It has be made to plug into an [slf4j 1.x backend](https://gitlab.com/nonseldiha/slf4j-mulog), so surely can be made to plug into other things.
 
@@ -31,7 +31,7 @@ The most obvious choice though is [SLF4J](https://www.slf4j.org/), apparently [t
 
 # Logging data with Slf4j 
 
-Enter slf4j 2.0 - which was released toward the end of 2022. The 2.0 version of this popular logging facade has newly includes an [API for logging data](https://www.slf4j.org/manual.html#fluent), whilst remaining backwards compatible with the 1.x API.
+Enter slf4j 2.0 - which was released toward the end of 2022. The 2.0 version of this popular logging facade newly includes an [API for logging data](https://www.slf4j.org/manual.html#fluent), whilst remaining backwards compatible with the 1.x API.
 
 The fluent API contains the `addKeyValue(String key, Object value)` method for structured logging. It's up to implementations as to what to do with the structured data. They may merge it to the [MDC](https://www.slf4j.org/api/org/slf4j/MDC.html) for that message for example as Log4j2-slf4j bridge does. The MDC is a map of String->String though, which is a problem if the value happens to be anything other than a string.
 
