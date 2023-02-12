@@ -59,6 +59,10 @@ If you're logging from a library it is possible to avoid having any logging depe
 
 java.util.logging (JUL) is the one you have most likely heard of. As you might guess though for something created in the early part of this century, it is a string-based logging API. [This question on Stackoverflow](https://stackoverflow.com/questions/11359187/why-not-use-java-util-logging) goes into some details about JUL but in the threads is mention of a newer platform Logging facade called [System.Logger](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/System.Logger.html) - which might be interesting but doesn't seem to have gained traction AFAICT.
 
+# References
+
+* [Better Java Logging](https://mccue.dev/pages/12-3-22-better-java-logging-2)
+
 # Unrelated FYI
 
 This is my first blog post since moving to [Quickblog](https://github.com/borkdude/quickblog) - a blogging tool powered by Clojure - thanks Borkdude!
