@@ -3,7 +3,7 @@
   <title>Henry Widd's Blog</title>
   <link href="https://widdindustries.com/blog/atom.xml" rel="self"/>
   <link href="https://widdindustries.com/blog"/>
-  <updated>2023-02-12T10:40:44+00:00</updated>
+  <updated>2023-03-02T14:04:17+00:00</updated>
   <id>https://widdindustries.com/blog</id>
   <author>
     <name>Henry Widd</name>
@@ -154,7 +154,7 @@ To get around that, consider converting the Instant to a ZonedDateTime first or 
 you might add a zone to your formatter. see https://stackoverflow.com/a/27483371/1700930. 
  
 You can disable these custom exceptions by setting -Dcljc.java-time.disable-helpful-exception-messages=true
-</code></pre><p>That message alone should at least prevent a lot of github issues and questions I get .... let's see!</p><p>I am adding that message because I think it's unlikely I could get java.time messages changed, I don't even  know how I would do that. I do know how to make this suggestion for the new date-time API being made for the world's most popular programming language though, raise <a href='https://github.com/tc39/proposal-temporal/issues/1233'>an issue!</a>. That improved error message may be my greatest contribution to humanity to date ;-)</p><h1>What about traditional wrappers like tick or clojure.java-time ?</h1><p>These are traditional wrappers and definitely come with trade-offs. In my work we use date logic a lot, which I think means it's an environment where it's worth learning to use a wrapper because of the extra+improved API. That being said, I use a wrapper for 80% of  regular date-arithmetic - for things I consider more obscure or esoteric, or where performance might suffer, I drop to cljc.java-time (which tick is using under the hood) - and in very rare cases - plain interop.</p><p>If you have any thoughts/questions, please let me know ;-)</p>]]></content>
+</code></pre><p>That message alone should at least prevent a lot of github issues and questions I get .... let's see!</p><p>I am adding that message because I think it's unlikely I could get java.time messages changed, I don't even  know how I would do that. I do know how to make this suggestion for the new date-time API being made for the world's most popular programming language though, raise <a href='https://github.com/tc39/proposal-temporal/issues/1233'>an issue!</a>. That improved error message may be my greatest contribution to humanity to date ;-)</p><h1>What about wrappers like juxt/tick or clojure.java-time ?</h1><p>These are traditional wrappers and definitely come with trade-offs. There is a section in the tick README, <a href='https://github.com/juxt/tick#should-you-use-tick-for-date-time-work'>Should you use tick for date-time work?</a> which tries to offer an objective guide on the choices available</p><p>In my work we use date logic a lot, which I think means it's an environment where it's worth learning to use a wrapper because of the extra+improved API. That being said, I use a wrapper for 80% of  regular date-arithmetic - for things I consider more obscure or esoteric, or where performance might suffer, I drop to cljc.java-time (which tick is using under the hood) - and in very rare cases - plain interop.</p><p>If you have any thoughts/questions, please let me know ;-)</p>]]></content>
   </entry>
   <entry>
     <id>https://widdindustries.com/blog/ecma-temporal-vs-java-time.html</id>

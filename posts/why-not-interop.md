@@ -96,9 +96,11 @@ know how I would do that. I do know how to make this suggestion for the new date
 programming language though, raise [an issue!](https://github.com/tc39/proposal-temporal/issues/1233). That
 improved error message may be my greatest contribution to humanity to date ;-)
 
-# What about traditional wrappers like tick or clojure.java-time ?
+# What about wrappers like juxt/tick or clojure.java-time ?
 
-These are traditional wrappers and definitely come with trade-offs. In my work we use date logic a lot, which I think
+These are traditional wrappers and definitely come with trade-offs. There is a section in the tick README, [Should you use tick for date-time work?](https://github.com/juxt/tick#should-you-use-tick-for-date-time-work) which tries to offer an objective guide on the choices available.
+
+In my work we use date logic a lot, which I think
 means it's an environment where it's worth learning to use a wrapper because of the extra+improved API. That being said, I use a wrapper for 80% of 
 regular date-arithmetic - for things I consider more obscure or esoteric, or where performance might suffer, I drop
 to cljc.java-time (which tick is using under the hood) - and in very rare cases - plain interop.
