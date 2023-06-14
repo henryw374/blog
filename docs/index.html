@@ -71,6 +71,49 @@
       <div>
 <h1>
   
+  <a href="what-is-inst.html">
+  
+  What is #inst ?
+  
+  </a>
+  
+</h1>
+<p>This post looks at the meaning of the <code>#inst</code> reader literal from edn (extensible data notation), how it behaves by default in Clojure(script) and when it might not be sufficient for representing date/time information.</p><p>The majority of the content of this post comes from the Rationale section of <a href='https://github.com/henryw374/time-literals'>the time-literals</a>, a Clojure(Script) library which provides tagged literals for java.time objects.</p><h2>What is #inst ?</h2><p>Reader Literals were a <a href='https://github.com/clojure/clojure/blob/master/changes.md#21-reader-literals'>headline new feature in Clojure 1.4</a> and with that came built-in support for the <a href='https://github.com/clojure/clojure/blob/master/changes.md#211-instant-literals'>#inst tag</a>. The <code>#inst</code> tag is a part of the edn spec, where it is defined as representing <a href='https://github.com/edn-format/edn#inst-rfc-3339-format'>an instant in time</a>, which means a point in time relative to UTC that is given to (at least) millisecond precision. The format of <code>#inst</code> is RFC3339, which is <a href='https://medium.com/easyread/understanding-about-rfc-3339-for-datetime-formatting-in-software-engineering-940aa5d5f68a'>like ISO8601 but slightly wider</a>.</p><p>In Clojure(script), <code>#inst</code> is read as a legacy platform <code>Date</code> object by default, but as is made clear by the edn spec and by <a href='https://github.com/matthiasn/talk-transcripts/blob/master/Hickey_Rich/AreasOfInterestForClojuresCore.md#extensible-reader'>this talk from Rich Hickey</a> the default implementation is just that: <code>#inst</code> may be read to whatever internal representation is useful to a consuming program. For example a program running on the jvm could read <code>#inst</code> tags to java.time.Instant (or java.time.OffsetDateTime if wishing to preserve the UTC offset information). It seems to me unfortunate that Clojure(script) provided defaults for <code>#inst</code> because users may not realise it is 'just a default', but that's just my opinion. My guess is that Clojure is trying to be both simple and easy in this case.</p><p>When conveying data using edn format, built-in tagged elements are preferred to user defined elements.</p><h2>When the default is not enough</h2><p>There are two situations where reader literals are useful:</p><ol><li>Conveying <code>edn</code> data between processes</li><li>REPL I/O</li></ol><p>Although they have many similarities and overlap, Clojure allows these cases to be considered separately and for good reason, as explained below: </p><h3>The need for more Tagged Elements representing Dates in edn</h3><p>There are many kinds of things relating to date and time that are not an <code>instant in time</code>, so <code>#inst</code> would not be an appropriate way to tag them. For example the month of a particular year such as 'January 1990' or a calendar date such as 'the first of June, 3030'. There are no built-in edn tags for these but tags can be provided in the user space, as they are by the <a href='https://github.com/henryw374/time-literals'>the time-literals</a> library.</p><p>Note that the default Clojure reader behaviour is to accept partially specified instants, such as <code>#inst &quot;2020&quot;</code> (and read that to a Date with millisecond precision) - but this is specific to the Clojure implementation and not valid edn (AFAIK).</p><h3>Round-tripping at the REPL</h3><p>Clojure provides two mechanisms for printing objects - abstract and concrete as this code printing the same object shows:</p><pre><code class="lang-clojure">&#40;let &#91;h &#40;java.util.HashMap.&#41;&#93;
+  {:abstract &#40;pr-str h&#41;
+   :concrete &#40;binding &#91;&#42;print-dup&#42; true&#93;
+               &#40;pr-str h&#41;&#41;}&#41;
+=&gt; {:abstract &quot;{}&quot;, :concrete &quot;#=&#40;java.util.HashMap. {}&#41;&quot;}
+</code></pre><p>The concrete representation is sometimes useful to know and also the string output can be passed back to the reader to recreate the same internal representation again, which is known as <code>round-tripping</code>.</p><p>The default readers and printers of platform date objects don't allow round-tripping, <a href='https://ask.clojure.org/index.php/11898/printing-and-reading-date-types'>the reason for which is unknown</a>.</p><p>This is relevant to the java.time types which logically correspond to <code>#inst</code> (java.time.Instant and java.time.OffsetDateTime). The <a href='https://github.com/henryw374/time-literals'>the time-literals</a> library contains specific readers and printers for those objects so that they do round-trip. When conveying these objects out of process in edn format, they should be tagged as <code>#inst</code> of course.  To do that, simply provide your own implementation of <code>clojure.core/print-method</code> for those types. With <code>&#42;print-dup&#42;</code> true, the concrete type will still show.</p><h2>When reader literals are NOT useful</h2><p>Consider this code from a Clojure namespace:</p><pre><code class="lang-clojure">&#40;ns foo.bar&#41;
+
+&#40;def one-day #time/period &quot;P1D&quot;&#41;
+
+&#40;defn one-more-day &#91;period&#93;
+  &#40;-&gt; period &#40;.plusDays 1&#41;&#41;&#41;
+
+</code></pre><p>Now answer:</p><ol><li>Will it compile?</li><li>If it can be made to compile, will <code>&#40;one-more-day one-day&#41;</code> work?</li></ol><p>Go back and have a look if required, I will reveal the answer in the next sentence</p><p>The answer to 1. is maybe, but only if <code>&#42;data-readers&#42;</code> contains a mapping for <code>time/period</code> AND the reader function is already loaded in the process. Just having a mapping in data_readers.cljc is not enough. Add a side-effecting require for that reader function you say? No thanks.</p><p>The answer to 2. is again maybe. If the mapping for <code>time/period</code> is set up AND the reader function returned a java.time.Period then it will work. </p><p>So tl;dr reader literals in code can be made to work but is not good practice IMHO. That goes for user-defined literals but also <code>#inst</code> and <code>#uuid</code>. Typing a few extra characters to call the actual constructor function directly is not so hard.</p>
+<p>Discuss this post <a href="">here</a>.</p>
+<p><i>Published: 2023-06-14</i></p>
+
+<p>
+  <i>
+  Tagged:
+  
+  <span class="tag">
+    <a href="tags/clojure.html">clojure</a>
+  </span>
+  
+  <span class="tag">
+    <a href="tags/date-time.html">date-time</a>
+  </span>
+  
+  </i>
+</p>
+
+
+</div>
+<div>
+<h1>
+  
   <a href="logging-data.html">
   
   Log data, not strings - with SLF4J
@@ -115,41 +158,6 @@
 </code></pre><p>which is the wrong answer! I still don't understand why io/resource shows the file there, whereas calling <code>require</code> on that ns returns the one embedded in Clojurescript.</p><p>One might ask why I would be using Clojurescript and clojure.data.json together in the same jvm.  Well, in my case, in development I tend to have my server and client dependencies combined, so  I run cljs compile and server side stuff in one vm. When deploying and testing, I separate them  (meaning Clojurescript jar is only on the classpath when cljs source is being compiled). It is possible to run separate server and cljs jvm's  locally of course, but that then means I can't have a single .nrepl.edn file for example. There could be  other reasons for using these 2 together though, writing data-reader functions that use json possibly.<br /></p><p>I raised this on clojure slack and now Clojurescript's maintainers are aware, so hopefully this gets fixed. </p><p>A fix is likely to involve <code>shading</code>. This is where a library wants to use a fixed version  of another library, so it copies the sources of that library into itself, but changes  the namespaces/packages of the source library to be something different, and specific to itself.</p><p>My thanks go to Alex Miller for explaining this.<br />  </p>
 <p>Discuss this post <a href="">here</a>.</p>
 <p><i>Published: 2022-02-09</i></p>
-
-<p>
-  <i>
-  Tagged:
-  
-  <span class="tag">
-    <a href="tags/clojure.html">clojure</a>
-  </span>
-  
-  </i>
-</p>
-
-
-</div>
-<div>
-<h1>
-  
-  <a href="async-meet-laziness.html">
-  
-  you Promise to be Lazy?
-  
-  </a>
-  
-</h1>
-<p>Combining Java's promises with Clojure's laziness yields some interesting behaviour</p><p>Consider:</p><pre><code class="lang-clojure">
-&#40;doseq &#91;x &#40;range 1000000&#41;&#93;&#41;
-
-</code></pre><p>Since <code>range</code> returns a lazy sequence and <code>doseq</code> does not retain the head of the sequence, there will only be one element of the sequence realized at every step of the <code>doseq</code>.</p><p>Now let's split the creation and consumption of the lazy sequence over chained promises.  I am using <a href='https://github.com/funcool/promesa'>the promesa library</a>, which on the jvm is a thin wrapper over java.util.concurrent#CompletableFuture.</p><pre><code class="lang-clojure">
-&#40;-&gt; &#40;p/resolved &#40;range 1000000&#41;&#41;
-    &#40;p/then &#40;fn &#91;xs&#93;
-              &#40;doseq &#91;x xs&#93;&#41;&#41;&#41;&#41;
-
-</code></pre><p>It looks like it should be just as lazy. Nowhere is the code above retaining a reference to  the head of the sequence - and yet it is! </p><p>The <code>then</code> promise internally has a reference to the preceding promise and that promise has a reference to its result - the head of the sequence. When the first promise returns, the sequence is unrealized, but as the subsequent <code>then</code> promise consumes the sequence it is realized and the head retained  by the preceding promise!</p><p>What happens if there is a longer chain of promises? A promise executing in a chain only has reference to the preceding one. The preceding one has lost its reference to the  next one upstream of itself, so in a chain just the current and immediately preceding one are not  gc-able. </p><p>So? Well imagine you are streaming results out of a db for example - that might be  modelled as a lazy seq, which is consumed through e.g. doseq and written out to a  stream. Sounds like a nice memory-friendly solution, but if the db request results in a  promise it might seem natural to keep chaining that result on. </p><h1>Further thoughts</h1><p>Does this apply to </p><ul><li>js promises? I would imagine so</li><li>core.async channels? I would guess not</li></ul><p>I haven't investigated.</p><p>Related to this topic is <a href='https://stuartsierra.com/2015/08/25/clojure-donts-lazy-effects'>Stuart Sierra's Lazy Effects</a> post, in which he says never mix laziness and side-effects. Good advice I would say.</p>
-<p>Discuss this post <a href="">here</a>.</p>
-<p><i>Published: 2022-02-03</i></p>
 
 <p>
   <i>

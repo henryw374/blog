@@ -15,6 +15,12 @@ https://github.com/juxt/reap/blob/29ffc8664df26041ebd93a53f009d2606d1a5b6c/src/d
 https://clojure.atlassian.net/browse/CLJ-2224 - print java.time.Instant as #inst
 cljs.instant adds this. so if you have cljs in classpath then you have it
 
+tagged literals design: https://github.com/matthiasn/talk-transcripts/blob/master/Hickey_Rich/AreasOfInterestForClojuresCore.md#extensible-reader
+
+current behaviour of clojure with dates
+https://ask.clojure.org/index.php/11898/printing-and-reading-date-types
+
+
 Alex Miller: data readers should read literals and one should not use reader functions for macro-like behavior.
 
 Reader Literals were the [headline new feature in Clojure 1.4](https://github.com/clojure/clojure/blob/master/changes.md#21-reader-literals)
@@ -49,7 +55,7 @@ an inst tagged literal represents a point in time, represented in RFC-3339 forma
 By default, Clojure readers will read this as a plaform Date object (java.util.Date, js/Date). 
 
 A full RFC-3339 `date-time` has a date and a time (optionally with fractions of a second) and an unambiguous UTC offset.
-The default Clojure readers go beyond the RFC/edn spec in interpreting partial versions of this though, so `#inst"2020"` will be 
+The default Clojure readers go beyond the RFC/edn spec in interpreting partial versions of this though, so `#inst "2020"` will be 
 read as `#inst"2020-01-01T00:00.0Z"`.     
  
 By default, `Date` objects print as `inst` tags and so do instances of `java.util.Calendar` and `java.sql.Timestamp`. 
