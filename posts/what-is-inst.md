@@ -4,7 +4,7 @@ Tags: clojure,date-time
 
 This post looks at the meaning of the `#inst` reader literal from [Extensible Data Notation](https://github.com/edn-format/edn) (hereafter referred to as 'edn'), how it behaves by default in Clojure(script) and when it might not be sufficient for representing date/time information.
 
-The majority of the content of this post comes from the Rationale section of [the time-literals](https://github.com/henryw374/time-literals), a Clojure(Script) library which provides tagged literals for java.time objects.
+The majority of the content of this post comes from the Rationale section of [time-literals](https://github.com/henryw374/time-literals), a Clojure(Script) library which provides tagged literals for java.time objects.
 
 ## What is #inst ?
 
@@ -19,7 +19,7 @@ Although edn readme doesn't say this explicitly, to avoid 'reinventing the wheel
 There are two situations where reader literals are useful:
 
 1. Conveying `edn` data between processes
-2. REPL I/O
+2. REPL I/O (iow "working at the REPL")
 
 Although they have many similarities and overlap, Clojure allows these cases to be considered separately and for good reason, as explained below: 
 
@@ -73,7 +73,11 @@ The answer to 1. is maybe, ie only if `*data-readers*` contains a mapping for `t
 
 The answer to 2. is again maybe. If the mapping for `time/period` is set up AND the reader function returned a java.time.Period then it will work. 
 
-So tl;dr reader literals in code can be made to work but is not good practice IMHO. That goes for user-defined literals but also `#inst` and `#uuid`. Typing a few extra characters to call the actual constructor function directly is not so hard. Btw if you want to do a find/replace for `#inst` in your source files then `clojure.instant/read-instant-date` or `cljs.reader/parse-timestamp` are probably the functions you need ;-)
+So tl;dr reader literals in code can be made to work but is not good practice IMHO. That goes for user-defined literals but also `#inst` and `#uuid`. Typing a few extra characters to call the actual constructor function directly is not so hard. 
+
+I don't mean I never have files with literals in them, but not in code I expect anybody else (incl. myself at a later date) to just be able to 'pick up and run'. If I'm flowing around in my own space then it's fine. If I get to 'crystalising stuff out' - e.g. to tests for CI, then I replace any literals.
+
+Btw if you want to do a find/replace for `#inst` in your source files then `clojure.instant/read-instant-date` or `cljs.reader/parse-timestamp` are probably the functions you need ;-)
 
 
 
