@@ -71,6 +71,33 @@
       <div>
 <h1>
   
+  <a href="taming-a-clojurescript-megabuild-with-shadow-and-kaocha.html">
+  
+  Taming a Clojurescript mega-project with Shadow and Kaocha
+  
+  </a>
+  
+</h1>
+<p>In this post I am going to look at applying my regular dev setup to a project with a lot of code and tests that take a very long time to run.</p><p>Firstly, here are my Clojurescript dev setup requirements:</p><ul><li>run a single test from the IDE - ie the one under the cursor</li><li>run all tests in namespace similar to above</li><li>run any subset of tests based on ns-pattern</li><li>see nicely formatted test output - for example clearly highlighting the diff in expected/actual maps</li><li>tests in CI output a standard format like junit xml, so results can be interpreted by CI tool</li><li>tests in CI can run under advanced compilation (so as to be similar to the production build)</li><li>fast incremental compile+reload</li></ul><p>Anything you'd add? If so please see link at the bottom for how to discuss</p><p>I should also say that I'm generally developing in multi-person teams building SPA's with considerable business complexity. However, the list is still the same even for my own open source or hobby projects, but in some situations not everything above is a must-have. For example, if you only have a small number of fast-running tests then the items above about running subsets of tests will not be so important. </p><p>I recently started to do some work on a project with around 800 Clojurescript (browser) tests - which in itself may not sound massive, but there are a number of slower DOM-clicking tests, so total test-run time above 20 minutes. It goes without saying that one would not want to run all the tests in one go - but this fact meant that builds and tests had been split apart and this had led to quite a bit of complexity in the build setup: Local dev was done with figwheel+webpack, configured with multiple <a href='https://figwheel.org/docs/extra_mains.html'>extra mains</a>, and shadow+karma in the CI environment. </p><p>With the existing build setup, on saving a file you could be waiting 10+ seconds to see the incremental build finish - ouch! To run a single test required knowing which figwheel 'extra-main' the test would be compiled into and loading the auto-test browser page for that, and then doing some other steps I'm not even going to get into... all in all, not ideal. </p><p>So... what to do? My preferred Clojurescript build and test setup for the past couple of years has been shadow plus kaocha-cljs2. Everyone knows shadow of course, but <a href='https://github.com/lambdaisland/kaocha-cljs2'>kaocha-cljs2</a> seems weirdly unstarred (< 20) and un-discussed on the interwebs. The combination of these two gives me the above wishlist of course - that's why I chose it. But how well would it scale to the new megaproject? How easy would it be to set up?</p><h2>Setup</h2><p>Possibly one reason kaocha-cljs2 seems under-appreciated is that by design there are more moving parts compared to other Clojurescript test setups I have used - for example one needs an extra server (Funnel) for 2-way communication between jvm and js environments. </p><p>However, setup couldn't have been easier - and that's because I have a little ready-made shadow+kaocha_cljs2 template that I use in all my projects and libraries. I've called this template <a href='https://github.com/henryw374/tiado-cljs2'>tiado-cljs2</a> and if you want to try it on your project, you'll have it up and running in minutes - see the README for instructions.</p><h2>Does it scale?</h2><p>In the way I set up Shadow on this project, there are 4 'watches' going at once, one for the main app, one for tests and a couple of others for some miscellaneous apps. Shadow incrementally compiles just what is needed so if changing a test file, just the test build kicks in. So compared to the old build, incremental compile is often around 5-10x faster. </p><p>When it comes to the tests, I have used kaocha suites to split the tests based on ns-patterns - which in CI can be run concurrently. Kaocha-cljs2 doesn't support 'ns-patterns' out of the box yet (as kaocha does for clojure tests) - but luckily kaocha supports user-defined hooks so <a href='https://github.com/lambdaisland/kaocha-cljs2/issues/32'>adding it was not difficult</a>.</p><p>With these mega test-suites, the default timeout was not enough. User-defined timeouts are not currently respected by kaocha-cljs2 - so <a href='https://github.com/lambdaisland/kaocha-cljs2/issues/31'>a little monkey patching was needed</a>.</p><p>As well as running individual suites, the holy grail of clojurescript testing is surely having an IDE hotkey to run the test under the caret. This is achieved with a simple macro invoking <code>&#40;kaocha.repl/run xxx&#41;</code> - a macro was required (rather than a function) so that it can be invoked when either in a cljs or clj repl.</p><p>I could have had multiple test watches instead of one - each watching a subset of tests (this is a shadow feature). However the single one works well enough and makes life easier for developers as there is just a single place for tests to run.</p><p>So, whilst compilation and test-running times still seem a bit bigger compared to what I'm used to, the whole thing now feels far more manageable. There may be scope for modularization of the app  - I don't know yet, but I'm much happier to investigate that and experiment with a solid, speedier build+test setup. </p><h2>Finally</h2><p>The fact that all this works as well as it does is thanks to the shadow and kaocha maintainers of course. Clojurescript would not be in such a good place without them!</p>
+<p>Discuss this post <a href="">here</a>.</p>
+<p><i>Published: 2023-08-17</i></p>
+
+<p>
+  <i>
+  Tagged:
+  
+  <span class="tag">
+    <a href="tags/clojure.html">clojure</a>
+  </span>
+  
+  </i>
+</p>
+
+
+</div>
+<div>
+<h1>
+  
   <a href="what-is-inst.html">
   
   What is #inst ?
@@ -127,37 +154,6 @@
 </code></pre><h2>Migration path</h2><p>If you're using clojure.tools.logging, you can keep your existing setup and just start writing slj4j 2.0 logging statements and that will likely 'just work' in that the data will get printed out in some string format according to your pattern config). Separately you can change your logging backend to  something that does more with structured logs than just turning them into strings, like writing them as JSON for example.</p><h1>Logging APIs bundled with the JVM</h1><p>If you're logging from a library it is possible to avoid having any logging dependency by using APIs included with the jvm.</p><p>java.util.logging (JUL) is the one you have most likely heard of. As you might guess though for something created in the early part of this century, it is a string-based logging API. <a href='https://stackoverflow.com/questions/11359187/why-not-use-java-util-logging'>This question on Stackoverflow</a> goes into some details about JUL but in the threads is mention of a newer platform Logging facade called <a href='https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/System.Logger.html'>System.Logger</a> - which might be interesting but doesn't seem to have gained traction AFAICT.</p><h1>References</h1><ul><li><a href='https://mccue.dev/pages/12-3-22-better-java-logging-2'>Better Java Logging</a></li></ul><h1>Unrelated FYI</h1><p>This is my first blog post since moving to <a href='https://github.com/borkdude/quickblog'>Quickblog</a> - a blogging tool powered by Clojure - thanks Borkdude!</p>
 <p>Discuss this post <a href="">here</a>.</p>
 <p><i>Published: 2023-02-09</i></p>
-
-<p>
-  <i>
-  Tagged:
-  
-  <span class="tag">
-    <a href="tags/clojure.html">clojure</a>
-  </span>
-  
-  </i>
-</p>
-
-
-</div>
-<div>
-<h1>
-  
-  <a href="clojurescript-jar-embeds-other-libs.html">
-  
-  Clojurescript jar embeds some core libraries
-  
-  </a>
-  
-</h1>
-<p><em>Update:</em> As of mid-2022, Clojurescript has fixed the problems described in this post.</p><p>Why having clojurescript in the classpath may lead to unexpected behaviour</p><p>The <a href='https://mvnrepository.com/artifact/org.clojure/clojurescript/1.11.4'>clojurescript maven artifact</a>  lists compile dependencies which include: data.json, tools.reader and transit-clj and transit-java. </p><p>However the clojurescript jar itself is something like an uberjar: It includes compiled data.json, tools.reader and transit-clj and transit-java namespaces inside itself. That means that although it declares dependencies on those libraries, when you use Clojurescript yourself, those libraries' artifacts are not used at all (despite being on your disk and in the classpath). </p><p>The output of this command shows the dependencies I am referring to:</p><pre><code>clj -Sdeps '{:deps {org.clojure/clojurescript {:mvn/version &quot;1.11.4&quot; } }}' -Stree
-</code></pre><p>The effect is that if you want to use a different version of one of those libraries  compared to the one Clojurescript was compiled with, you can't. Well, you can't with the regular clojurescript artifact, you can use the non-aot version: <code>org.clojure/clojurescript$slim {:mvn/version “1.11.4”}</code>.</p><p>This was not an issue for a long time because those libraries didn't change. Now e.g. clojure.data.json has changed, hence why I hit the problem. </p><p>A handy technique I usually use to answer the question 'where on the classpath is namespace x.y.z getting loaded  from?' is to call <code>io/resource</code> on it. Doing that with data.json and Clojurescript in the classpath  gives result as follows: </p><pre><code class="lang-clojure"> &#40;clojure.java.io/resource &quot;clojure/data/json.clj&quot;&#41;
- 
- =&gt; &quot;.../.m2/repository/org/clojure/data.json/2.4.0/data.json-2.4.0.jar!/clojure/data/json.clj&quot;&#93;
-</code></pre><p>which is the wrong answer! I still don't understand why io/resource shows the file there, whereas calling <code>require</code> on that ns returns the one embedded in Clojurescript.</p><p>One might ask why I would be using Clojurescript and clojure.data.json together in the same jvm.  Well, in my case, in development I tend to have my server and client dependencies combined, so  I run cljs compile and server side stuff in one vm. When deploying and testing, I separate them  (meaning Clojurescript jar is only on the classpath when cljs source is being compiled). It is possible to run separate server and cljs jvm's  locally of course, but that then means I can't have a single .nrepl.edn file for example. There could be  other reasons for using these 2 together though, writing data-reader functions that use json possibly.<br /></p><p>I raised this on clojure slack and now Clojurescript's maintainers are aware, so hopefully this gets fixed. </p><p>A fix is likely to involve <code>shading</code>. This is where a library wants to use a fixed version  of another library, so it copies the sources of that library into itself, but changes  the namespaces/packages of the source library to be something different, and specific to itself.</p><p>My thanks go to Alex Miller for explaining this.<br />  </p>
-<p>Discuss this post <a href="">here</a>.</p>
-<p><i>Published: 2022-02-09</i></p>
 
 <p>
   <i>
