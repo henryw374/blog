@@ -1,6 +1,6 @@
 {:aliases 
  {:quickblog
-  {:extra-deps {io.github.borkdude/quickblog {:git/sha "74b1faff8b1e39079c66d82ec2a1e7e6f5dcc89b"}
+  {:extra-deps {io.github.borkdude/quickblog {:git/sha "fbfbd5a11c79629bdda0f25751fcff14735edea2"}
                 markdown-clj/markdown-clj {:mvn/version "1.11.4"}
           org.babashka/cli {:mvn/version "0.3.35"}}
    :main-opts ["-m" "babashka.cli.exec" "quickblog.cli" "run"]
