@@ -17,7 +17,7 @@ There are different ways this can happen, for example:
 * use `:target :bundle` with [a bundler such as webpack](https://clojurescript.org/guides/webpack)
 * use shadow-cljs with its default [shadow provider](https://shadow-cljs.github.io/docs/UsersGuide.html#js-provider)
 
-I am a fan of shadow-cljs and so would typically use the second option. What this actually does is `:simple` optimizations on 3rd-party code, which means Google Closure code is going to read 3rd-party libs when the app is being built. Sometimes though, Closure cannot understand the 3rd party code, for example because [it doesnt have support for Class fields](https://github.com/google/closure-compiler/issues/2731). In this really interesting [talk from Alex Davis](https://youtu.be/fT28NeZtaAg?si=1Tbxw3NMk3Cmy_aO&t=1170), he says he is seeing more and more popular JS libraries that Closure can't handle. I've only had the issue once myself and thankfully was able to configure shadow to use a different file than the problem one.
+I am a fan of shadow-cljs and so would typically use the second option. What this actually does is `:simple` optimizations on 3rd-party code, which means Google Closure code is going to read 3rd-party libs when the app is being built. Sometimes though, Closure cannot understand the 3rd party code, for example because [it doesnt have support for Class fields](https://github.com/google/closure-compiler/issues/2731). In this really interesting [talk from Alex Davis](https://youtu.be/fT28NeZtaAg?si=1Tbxw3NMk3Cmy_aO&t=1473), he says he is seeing more and more popular JS libraries that Closure can't handle. I've only had the issue once myself and thankfully was able to configure shadow to use a different file than the problem one.
 
 So, what to do?
 
