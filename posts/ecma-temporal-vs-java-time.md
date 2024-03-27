@@ -2,6 +2,16 @@ Title: Temporal (Javascript's new Date-Time API) vs java.time (JSJoda on JS runt
 Date: 2020-08-02
 Tags: clojure,javascript,java,date-time
 
+*UPDATE 2024-03:* Since this blog was published the Temporal API has evolved and addressed many of the issues raised here. Notably, 
+
+* the Absolute entity is now Instant, the same as java.time  
+* there is a ZonedDateTime entity
+* 'Plain' is the prefix equivalent to java.time's 'Local'
+* there are now facilities for truncation/rounding in the API
+* there is a new library [Tempo](https://github.com/henryw374/tempo) that targets both java.time and Temporal
+
+Original content from here onwards
+
 If you are involved in the manufacture of computers in Europe then you're probably already aware that your
 friendly local 39th technical committee has it's own <a href="https://www.ecma-international.org/publications/standards/Ecma-262.htm" target="_blank">toy scripting language</a> and that language's support for 
 dates and times is somewhat lacking (<a href="https://www.youtube.com/watch?v=aVuor-VAWTI" target="_blank">good talk on that</a>). 
