@@ -69,7 +69,7 @@
   Clojure(Script) date-time libs, Shadow-cljs &amp; Babashka
   
 </h1>
-<h1>Time libs on npm/Shadow</h1><p><a href='https://github.com/juxt/tick'>tick</a> is a Clojure(Script) library for working with time. <a href='https://github.com/henryw374/cljc.java-time'>cljc.java-time</a> is used by tick and provides a cross-platform version of the java.time api. </p><p>In the latest releases, these 'just work' on Shadow-cljs, for example:</p><pre><code>echo '{:deps { tick {:mvn/version &quot;0.4.25-alpha&quot;} thheller/shadow-cljs {:mvn/version &quot;2.9.8&quot;} }}' &gt; deps.edn
+<h1 id="time&#95;libs&#95;on&#95;npm/shadow">Time libs on npm/Shadow</h1><p><a href='https://github.com/juxt/tick'>tick</a> is a Clojure(Script) library for working with time. <a href='https://github.com/henryw374/cljc.java-time'>cljc.java-time</a> is used by tick and provides a cross-platform version of the java.time api. </p><p>In the latest releases, these 'just work' on Shadow-cljs, for example:</p><pre><code>echo '{:deps { tick {:mvn/version &quot;0.4.25-alpha&quot;} thheller/shadow-cljs {:mvn/version &quot;2.9.8&quot;} }}' &gt; deps.edn
 echo '{:deps {}}' &gt; shadow-cljs.edn
 echo '{}' &gt; package.json
 
@@ -79,7 +79,7 @@ nil
 cljs.user=&gt; &#40;t/today&#41;
 #time/date &quot;2020-05-31&quot;
 
-</code></pre><p>Why is this news? Well, previously Shadow and other npm-using Clojurescript users of Tick/cljc.java-time had to include an extra shim library and manually include the js-joda dependencies in their package.json. A desire to move to the latest (and now scope-named) '@js-joda/core' packages, <a href='https://clojure.atlassian.net/browse/CLJS-3138'>a fix in the latest Clojurescript release</a> and an increase in my understanding of <a href='http://widdindustries.com/cljs-npm-libraries/'>how to package Clojurescript libraries</a> has resulted in these improvements. Note, there are still a few <a href='https://github.com/juxt/tick/blob/master/docs/cljs.adoc'>need-to-knows for Clojurescript users</a>, but not too many!</p><h1>Babashka</h1><p>In other news <a href='https://github.com/henryw374/cljc.java-time'>cljc.java-time</a> now works on a third platform, <a href='https://github.com/borkdude/babashka/'>babashka</a>!</p>
+</code></pre><p>Why is this news? Well, previously Shadow and other npm-using Clojurescript users of Tick/cljc.java-time had to include an extra shim library and manually include the js-joda dependencies in their package.json. A desire to move to the latest (and now scope-named) '@js-joda/core' packages, <a href='https://clojure.atlassian.net/browse/CLJS-3138'>a fix in the latest Clojurescript release</a> and an increase in my understanding of <a href='http://widdindustries.com/cljs-npm-libraries/'>how to package Clojurescript libraries</a> has resulted in these improvements. Note, there are still a few <a href='https://github.com/juxt/tick/blob/master/docs/cljs.adoc'>need-to-knows for Clojurescript users</a>, but not too many!</p><h1 id="babashka">Babashka</h1><p>In other news <a href='https://github.com/henryw374/cljc.java-time'>cljc.java-time</a> now works on a third platform, <a href='https://github.com/borkdude/babashka/'>babashka</a>!</p>
 <p>Discuss this post <a href="https://github.com/henryw374/blog/discussions/categories/posts">here</a>.</p>
 <p><i>Published: 2020-05-31</i></p>
 

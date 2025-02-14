@@ -1,7 +1,7 @@
 watch:
-			clj -Mquickblog watch
+			clj -Xquickblog-watch
 clean:
-			clj -Mquickblog clean
+			clj -Xquickblog-clean
 
 # hooray for stackoverflow
 .PHONY: list

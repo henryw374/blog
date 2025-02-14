@@ -1,9 +1,22 @@
-{:aliases 
- {:quickblog
-  {:extra-deps {io.github.borkdude/quickblog {:git/sha "fbfbd5a11c79629bdda0f25751fcff14735edea2"}
-                markdown-clj/markdown-clj {:mvn/version "1.11.4"}
-          org.babashka/cli {:mvn/version "0.3.35"}}
-   :main-opts ["-m" "babashka.cli.exec" "quickblog.cli" "run"]
+{:deps {io.github.borkdude/quickblog {:git/sha "3a1d6aff07f692f6e62606317f3d9e981b1df702"}
+              markdown-clj/markdown-clj {:mvn/version "1.11.4"}
+              org.babashka/cli {:mvn/version "0.3.35"}}
+ :aliases 
+ {:quickblog-clean {
+                    :exec-fn quickblog.api/clean
+                    :exec-args {:blog-title "Henry Widd's Blog"
+                                :blog-author "Henry Widd"
+                                :blog-description "Miscellania"
+                                :blog-root "https://widdindustries.com/blog"
+                                :out-dir "docs"
+                                :about-link "https://widdindustries.com/about"
+                                :discuss-link "https://github.com/henryw374/blog/discussions/categories/posts"
+                                :twitter-handle "henryw374"}
+                    }
+  :quickblog-watch
+  {
+   ;:main-opts ["-m" "babashka.cli.exec" "quickblog.cli" "run"]
+   :exec-fn quickblog.api/watch
    :exec-args {:blog-title "Henry Widd's Blog"
                :blog-author "Henry Widd"
                :blog-description "Miscellania"
