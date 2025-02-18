@@ -39,9 +39,9 @@ To demonstrate that, have a look at the following, which is like `range` but the
 This is what one might call an `outside-in lazy sequence`. As the sequence is generated, one might picture it like this:
 
 ```clojure
-(4000, `f`)
-(4000, 3999, `f`)
-(4000, 3999, 3998, `f`)
+(4000, LazySeq-obj)
+(4000, 3999, LazySeq-obj)
+(4000, 3999, 3998, LazySeq-obj)
 ...
 ```
 
@@ -58,10 +58,9 @@ The equivalent to the way `concat` was used in the original post would be more l
 
 Now visualising the sequence generation, it would look more like this:
 
-```clojure
-(`f`) 
-(conj (`f`) 4000)
-(conj (conj (`f`) 3999) 4000)
+```clojure 
+(conj LazySeq-obj 4000)
+(conj (conj LazySeq-obj 3999) 4000)
 ...
 (conj `...` (conj nil 1) `...` 4000)    
 ```
@@ -75,3 +74,7 @@ The original post concludes `Don’t use lazy sequence operations in a non-lazy 
 If deciding to use laziness, avoid building sequences inside-out - this might be in your direct usage of e.g. `lazy-seq` or hiding in plain sight in your usage of e.g. clojure.core functions such as concat.
 
 
+# Further Reading
+
+* The inside-out lazy seq topic is also covered in [Clojure Brain Teasers](https://pragprog.com/titles/mmclobrain/clojure-brain-teasers/) if you want more pictures and explanation (in Boom Goes the Dynamite chapter).
+* [Clojure's Deadly sin](https://clojure-goes-fast.com/blog/clojures-deadly-sin/) is a very well considered and comprehensive look into the problems of laziness in clojure.
