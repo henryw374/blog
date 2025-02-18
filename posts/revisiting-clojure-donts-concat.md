@@ -2,9 +2,9 @@ Title: Revisiting 'Clojure Don'ts : concat
 Date: 2025-02-14
 Tags: clojure
 
-# Nostalgia city
+# Nostalgia City
 
-I've recently started maintaining a Clojure codebase that hasn't been touched for over a decade - all Clojure devs that built and maintained it are long gone. It's using java8, Clojure 1.6 and libs like korma and noir - remember those? Contrary to the prevailing Clojure lore, upgrading Clojure will not be just a matter of changing version numbers in the lein project.clj.
+I've recently started maintaining a Clojure codebase that hasn't been touched for over a decade - all Clojure devs that built and maintained it are long gone. It's using java8, Clojure 1.6 and libs like `korma` and `noir` - remember those? Contrary to the prevailing Clojure lore, upgrading Clojure will not be just a matter of changing version numbers in the lein project.clj.
 
 I find one of the most dated aspects of the project is the laziness. I only use laziness as an explicit choice and have done so for many years. Laziness is a feature I find I rarely need, but is sometimes just the right fit. 
 

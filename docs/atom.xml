@@ -3,7 +3,7 @@
   <title>Henry Widd's Blog</title>
   <link href="https://widdindustries.com/blog/atom.xml" rel="self"/>
   <link href="https://widdindustries.com/blog"/>
-  <updated>2025-02-14T14:13:30+00:00</updated>
+  <updated>2025-02-18T09:53:49+00:00</updated>
   <id>https://widdindustries.com/blog</id>
   <author>
     <name>Henry Widd</name>
@@ -22,20 +22,19 @@
 &#40;let &#91;&#95; &#40;seq &#40;range-descending 4000&#41;&#41;&#93;
   nil&#41; ; =&gt; ok, no overflow
 
-</code></pre><p>This is what one might call an <code>outside-in lazy sequence</code>. As the sequence is generated, one might picture it like this:</p><pre><code class="lang-clojure language-clojure">&#40;4000, `f`&#41;
-&#40;4000, 3999, `f`&#41;
-&#40;4000, 3999, 3998, `f`&#41;
+</code></pre><p>This is what one might call an <code>outside-in lazy sequence</code>. As the sequence is generated, one might picture it like this:</p><pre><code class="lang-clojure language-clojure">&#40;4000, LazySeq-obj&#41;
+&#40;4000, 3999, LazySeq-obj&#41;
+&#40;4000, 3999, 3998, LazySeq-obj&#41;
 ...
 </code></pre><p>Calling seq on the collection, only the first element is realized, so no overflow.</p><p>The equivalent to the way <code>concat</code> was used in the original post would be more like this:</p><pre><code class="lang-clojure language-clojure">  &#40;defn range-descending-ohno &#91;x&#93;
     &#40;when &#40;pos? x&#41;
       &#40;lazy-seq
         &#40;conj &#40;range-descending &#40;dec x&#41;&#41; x&#41;&#41;&#41;&#41;
-</code></pre><p>Now visualising the sequence generation, it would look more like this:</p><pre><code class="lang-clojure language-clojure">&#40;`f`&#41; 
-&#40;conj &#40;`f`&#41; 4000&#41;
-&#40;conj &#40;conj &#40;`f`&#41; 3999&#41; 4000&#41;
+</code></pre><p>Now visualising the sequence generation, it would look more like this:</p><pre><code class="lang-clojure language-clojure">&#40;conj LazySeq-obj 4000&#41;
+&#40;conj &#40;conj LazySeq-obj 3999&#41; 4000&#41;
 ...
 &#40;conj `...` &#40;conj nil 1&#41; `...` 4000&#41;    
-</code></pre><p>Now when calling <code>seq</code> (as in <code>&#40;seq &#40;range-descending-ohno 4000&#41;&#41;</code>), the whole sequence needs to be realised for <code>seq</code> to get to the first element (4000 in the example). As the post says: <code>seq has to recurse through them until it finds an actual value</code>. One might call this an <code>inside-out lazy sequence</code>. </p><h1 id="conclusion">Conclusion</h1><p>The original post concludes <code>Don’t use lazy sequence operations in a non-lazy loop</code> - which I would update to add <code>don't use laziness at all unless required</code>.</p><p>If deciding to use laziness, avoid building sequences inside-out - this might be in your direct usage of e.g. <code>lazy-seq</code> or hiding in plain sight in your usage of e.g. clojure.core functions such as concat.</p>]]></content>
+</code></pre><p>Now when calling <code>seq</code> (as in <code>&#40;seq &#40;range-descending-ohno 4000&#41;&#41;</code>), the whole sequence needs to be realised for <code>seq</code> to get to the first element (4000 in the example). As the post says: <code>seq has to recurse through them until it finds an actual value</code>. One might call this an <code>inside-out lazy sequence</code>. </p><h1 id="conclusion">Conclusion</h1><p>The original post concludes <code>Don’t use lazy sequence operations in a non-lazy loop</code> - which I would update to add <code>don't use laziness at all unless required</code>.</p><p>If deciding to use laziness, avoid building sequences inside-out - this might be in your direct usage of e.g. <code>lazy-seq</code> or hiding in plain sight in your usage of e.g. clojure.core functions such as concat.</p><h1 id="further&#95;reading">Further Reading</h1><ul><li>The inside-out lazy seq topic is also covered in <a href='https://pragprog.com/titles/mmclobrain/clojure-brain-teasers/'>Clojure Brain Teasers</a> if you want more pictures and explanation (in Boom Goes the Dynamite chapter).</li><li><a href='https://clojure-goes-fast.com/blog/clojures-deadly-sin/'>Clojure's Deadly sin</a> is a very well considered and comprehensive look into the problems of laziness in clojure.</li></ul>]]></content>
   </entry>
   <entry>
     <id>https://widdindustries.com/blog/clojurescript-importmap.html</id>
