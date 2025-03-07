@@ -10,7 +10,7 @@ I find one of the most dated aspects of the project is the laziness. I only use 
 
 A lot of the original Clojure collection functions are lazy and it is still common to see new code written with them - I think because they are still seen as an idiomatic default, rather than a conscious choice. Non-lazy versions like `mapv` and `filterv` came later and transducers later still, but of course the old functions must continue to work as before.
 
-Investigating a bug in the codebase led me back to this great blog post, [Clojure Dont's: Concat](https://stuartsierra.com/2015/04/26/clojure-donts-concat) also written around a decade ago. The rest of this post will discuss that post, so if you haven't please read that (and ofc the rest of the 'Dont's series is also good').
+Investigating a bug in the codebase led me back to this great blog post, [Clojure Dont's: Concat](https://stuartsierra.com/2015/04/26/clojure-donts-concat) also written around a decade ago. The rest of this post will discuss that post, so if you haven't read it, please read that first (and ofc the rest of the 'Dont's series is also good').
 
 # Revisiting the post
 
@@ -53,7 +53,7 @@ The equivalent to the way `concat` was used in the original post would be more l
   (defn range-descending-ohno [x]
     (when (pos? x)
       (lazy-seq
-        (conj (range-descending (dec x)) x))))
+        (conj (range-descending-ohno (dec x)) x))))
 ```
 
 Now visualising the sequence generation, it would look more like this:
@@ -78,3 +78,4 @@ If deciding to use laziness, avoid building sequences inside-out - this might be
 
 * The inside-out lazy seq topic is also covered in [Clojure Brain Teasers](https://pragprog.com/titles/mmclobrain/clojure-brain-teasers/) if you want more pictures and explanation (in Boom Goes the Dynamite chapter).
 * [Clojure's Deadly sin](https://clojure-goes-fast.com/blog/clojures-deadly-sin/) is a very well considered and comprehensive look into the problems of laziness in clojure.
+* clj-kondo config to [discourage use of laziness](https://github.com/imrekoszo/unlazy)
